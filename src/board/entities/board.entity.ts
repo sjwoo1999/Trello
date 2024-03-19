@@ -1,14 +1,26 @@
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { IsArray, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Color } from '../types/color.type';
 import { Visibility } from '../types/visibility.type';
-import { Member } from 'src/member/entities/member.entity';
 import { Columns } from 'src/column/entities/column.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Entity({ name: 'boards' })
 export class Board {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @IsArray()
+  member: number[];
 
   @IsString()
   @Column({ type: 'varchar', length: 30, nullable: false })
@@ -24,9 +36,9 @@ export class Board {
   @Column({ type: 'enum', enum: Color, default: Color.black })
   color: Color;
 
-  @IsEnum(Visibility, { message: "유효하지 않은 공개범위입니다." })
+  @IsEnum(Visibility, { message: '유효하지 않은 공개범위입니다.' })
   @Column({ type: 'enum', enum: Visibility, nullable: false })
-  @IsNotEmpty({ message: "공개 범위를 선택해주세요." })
+  @IsNotEmpty({ message: '공개 범위를 선택해주세요.' })
   visibility: Visibility;
 
   @CreateDateColumn()
@@ -35,8 +47,9 @@ export class Board {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Member, (member) => member.board)
-  members: Member[];
+  @ManyToMany(() => User, (user) => user.boards)
+  @JoinColumn({ name: 'member', referencedColumnName: 'id' })
+  users: User[];
 
   @OneToMany(() => Columns, (column) => column.board)
   columns: Columns[];

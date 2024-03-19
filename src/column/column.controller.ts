@@ -12,6 +12,7 @@ export class ColumnController {
     private readonly boardService: BoardService,
   ) {}
 
+  // @UseGuards(AuthGuard())
   @Post()
   async createColumn(
     @Param('boardId') boardId: number,
@@ -25,6 +26,7 @@ export class ColumnController {
     await this.columnService.createColumn(createColumn);
   }
 
+  // @UseGuards(AuthGuard())
   @Get()
   async findAllColumns(@Param('boardId') boardId: number) {
     try {
@@ -36,6 +38,7 @@ export class ColumnController {
     }
   }
 
+  // @UseGuards(AuthGuard())
   @Patch('/:columnId')
   async editColumn(
     @Param('boardId') boardId: number,
