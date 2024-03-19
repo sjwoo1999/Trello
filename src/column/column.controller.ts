@@ -18,12 +18,16 @@ export class ColumnController {
     @Param('boardId') boardId: number,
     @Body() createColumn: CreateColumnDto,
   ) {
-    await validate(createColumn);
+    try {
+      await validate(createColumn);
 
-    await this.boardService.findBoardById(boardId);
-    createColumn.boardId = boardId;
+      await this.boardService.findBoardById(boardId);
+      createColumn.boardId = boardId;
 
-    await this.columnService.createColumn(createColumn);
+      await this.columnService.createColumn(createColumn);
+    } catch (error) {
+      return { message: `${error}` };
+    }
   }
 
   // @UseGuards(AuthGuard())

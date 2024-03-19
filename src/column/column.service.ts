@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateColumnDto } from './dto/create-column.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Columns } from './entities/column.entity';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { UpdateColumnDto } from './dto/update-column.dto';
 
 @Injectable()
@@ -10,38 +10,24 @@ export class ColumnService {
   constructor(
     @InjectRepository(Columns)
     private readonly columnRepository: Repository<Columns>,
-    private dataSource: DataSource,
   ) {}
 
   async createColumn(createColumnDto: CreateColumnDto) {
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+    const columns = await this.findAllColumns(createColumnDto.boardId);
+    let order = 0;
 
-    try {
-      const columns = await this.findAllColumns(createColumnDto.boardId);
-      let order = 0;
-
-      if (!columns) {
-        order = 0;
-      } else {
-        columns.map((column) => {
-          order = Math.max(column.order);
-        });
-      }
-      createColumnDto.order = order;
-
-      await queryRunner.manager.save(Columns, createColumnDto);
-
-      await queryRunner.commitTransaction();
-
-      return { message: '컬럼이 생성되었습니다.' };
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      return { message: `${error}` };
-    } finally {
-      await queryRunner.release();
+    if (!columns) {
+      order = 0;
+    } else {
+      columns.map((column) => {
+        order = Math.max(column.order);
+      });
     }
+    createColumnDto.order = order;
+
+    await this.columnRepository.save(createColumnDto);
+
+    return { message: '컬럼이 생성되었습니다.' };
   }
 
   async findAllColumns(boardId: number) {
