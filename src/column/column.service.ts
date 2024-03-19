@@ -1,26 +1,59 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateColumnDto } from './dto/create-column.dto';
-import { UpdateColumnDto } from './dto/update-column.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Columns } from './entities/column.entity';
+import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
 export class ColumnService {
-  create(createColumnDto: CreateColumnDto) {
-    return 'This action adds a new column';
+  constructor(
+    @InjectRepository(Columns)
+    private readonly columnRepository: Repository<Columns>,
+    private dataSource: DataSource,
+  ) {}
+
+  async createColumn(createColumnDto: CreateColumnDto) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const columns = await this.findAllColumns();
+      let order = 0;
+
+      if ('message' in columns) {
+        order = 0;
+      } else {
+        columns.map((column) => {
+          order = Math.max(column.order);
+        });
+      }
+      createColumnDto.order = order;
+
+      await queryRunner.manager.save(Columns, createColumnDto);
+
+      await queryRunner.commitTransaction();
+
+      return { message: '컬럼이 생성되었습니다.' };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      return { message: `${error}` };
+    } finally {
+      await queryRunner.release();
+    }
   }
 
-  findAll() {
-    return `This action returns all column`;
-  }
+  async findAllColumns() {
+    try {
+      const columns = await this.columnRepository.find();
 
-  findOne(id: number) {
-    return `This action returns a #${id} column`;
-  }
+      if (!columns) {
+        throw new NotFoundException('컬럼을 찾을 수 없습니다.');
+      }
 
-  update(id: number, updateColumnDto: UpdateColumnDto) {
-    return `This action updates a #${id} column`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} column`;
+      return columns;
+    } catch (error) {
+      return { message: `${error}` };
+    }
   }
 }

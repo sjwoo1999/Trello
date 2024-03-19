@@ -1,34 +1,26 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { ColumnService } from './column.service';
 import { CreateColumnDto } from './dto/create-column.dto';
-import { UpdateColumnDto } from './dto/update-column.dto';
+import { BoardService } from 'src/board/board.service';
 
-@Controller('column')
+@Controller('/board/:boardId/column')
 export class ColumnController {
-  constructor(private readonly columnService: ColumnService) {}
+  constructor(
+    private readonly columnService: ColumnService,
+    private readonly boardService: BoardService,
+  ) {}
 
   @Post()
-  create(@Body() createColumnDto: CreateColumnDto) {
-    return this.columnService.create(createColumnDto);
+  async createColumn(
+    @Param('boardId') boardId: number,
+    @Body() createColumn: CreateColumnDto,
+  ) {
+    await this.boardService.findBoardById(boardId);
+    createColumn.boardId = boardId;
+
+    await this.columnService.createColumn(createColumn);
   }
 
   @Get()
-  findAll() {
-    return this.columnService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.columnService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateColumnDto: UpdateColumnDto) {
-    return this.columnService.update(+id, updateColumnDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.columnService.remove(+id);
-  }
+  async findAllColumn() {}
 }

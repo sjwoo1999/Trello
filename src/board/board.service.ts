@@ -1,26 +1,22 @@
-import { Injectable } from '@nestjs/common';
-import { CreateBoardDto } from './dto/create-board.dto';
-import { UpdateBoardDto } from './dto/update-board.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Board } from './entities/board.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class BoardService {
-  create(createBoardDto: CreateBoardDto) {
-    return 'This action adds a new board';
-  }
+  constructor(
+    @InjectRepository(Board)
+    private readonly boardRepository: Repository<Board>,
+  ) {}
 
-  findAll() {
-    return `This action returns all board`;
-  }
+  async findBoardById(id: number) {
+    const board = await this.boardRepository.findOneBy({ id });
 
-  findOne(id: number) {
-    return `This action returns a #${id} board`;
-  }
+    if (!board) {
+      throw new NotFoundException('해당 보드를 찾을 수 없습니다.');
+    }
 
-  update(id: number, updateBoardDto: UpdateBoardDto) {
-    return `This action updates a #${id} board`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} board`;
+    return board;
   }
 }
