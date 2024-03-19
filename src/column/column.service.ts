@@ -3,6 +3,7 @@ import { CreateColumnDto } from './dto/create-column.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Columns } from './entities/column.entity';
 import { DataSource, Repository } from 'typeorm';
+import { UpdateColumnDto } from './dto/update-column.dto';
 
 @Injectable()
 export class ColumnService {
@@ -21,7 +22,7 @@ export class ColumnService {
       const columns = await this.findAllColumns(createColumnDto.boardId);
       let order = 0;
 
-      if ('message' in columns) {
+      if (!columns) {
         order = 0;
       } else {
         columns.map((column) => {
@@ -43,17 +44,31 @@ export class ColumnService {
     }
   }
 
-  async findAllColumns(boardId) {
-    try {
-      const columns = await this.columnRepository.findBy({ boardId });
+  async findAllColumns(boardId: number) {
+    const columns = await this.columnRepository.findBy({ boardId });
 
-      if (!columns) {
-        throw new NotFoundException('컬럼을 찾을 수 없습니다.');
-      }
-
-      return columns;
-    } catch (error) {
-      return { message: `${error}` };
+    if (!columns) {
+      throw new NotFoundException('컬럼을 찾을 수 없습니다.');
     }
+
+    return columns;
+  }
+
+  async findColumn(id: number) {
+    const column = await this.columnRepository.findOneBy({ id });
+
+    if (!column) {
+      throw new NotFoundException('해당 컬럼을 찾을 수 없습니다.');
+    }
+
+    return column;
+  }
+
+  async editColumn(columnId: number, updateColumnDto: UpdateColumnDto) {
+    const column = await this.findColumn(columnId);
+
+    await this.columnRepository.update(column, updateColumnDto);
+
+    return { message: '해당 컬럼을 수정하였습니다.' };
   }
 }

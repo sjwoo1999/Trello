@@ -1,3 +1,7 @@
 export enum Category {
-  Tech,
+  firstCategory,
+  secondCategory,
+  thirdCategory,
+  fourthCategory,
+  fifthCategory,
 }
