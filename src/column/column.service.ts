@@ -18,7 +18,7 @@ export class ColumnService {
     await queryRunner.startTransaction();
 
     try {
-      const columns = await this.findAllColumns();
+      const columns = await this.findAllColumns(createColumnDto.boardId);
       let order = 0;
 
       if ('message' in columns) {
@@ -43,9 +43,9 @@ export class ColumnService {
     }
   }
 
-  async findAllColumns() {
+  async findAllColumns(boardId) {
     try {
-      const columns = await this.columnRepository.find();
+      const columns = await this.columnRepository.findBy({ boardId });
 
       if (!columns) {
         throw new NotFoundException('컬럼을 찾을 수 없습니다.');

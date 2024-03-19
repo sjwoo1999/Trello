@@ -22,5 +22,9 @@ export class ColumnController {
   }
 
   @Get()
-  async findAllColumn() {}
+  async findAllColumns(@Param('boardId') boardId: number) {
+    await this.boardService.findBoardById(boardId);
+
+    await this.columnService.findAllColumns(boardId);
+  }
 }
