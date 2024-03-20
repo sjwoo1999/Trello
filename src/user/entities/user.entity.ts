@@ -1,12 +1,12 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Role } from '../types/user.type';
 import { Card } from 'src/card/entities/card.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 
 @Entity({ name: 'users' })
 export class User {
-  @PrimaryGeneratedColumn({unsigned: true})
+  @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
   @IsString()

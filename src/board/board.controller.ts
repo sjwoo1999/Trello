@@ -1,34 +1,82 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { BoardService } from './board.service';
 import { CreateBoardDto } from './dto/create-board.dto';
+import { validate } from 'class-validator';
 import { UpdateBoardDto } from './dto/update-board.dto';
 
 @Controller('board')
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
+  // @UseGuards(AuthGuard())
   @Post()
-  create(@Body() createBoardDto: CreateBoardDto) {
-    return this.boardService.create(createBoardDto);
+  async createBoard(
+    @Body() createBoardDto: CreateBoardDto,
+    // @userInfo user: User
+  ) {
+    try {
+      await validate(createBoardDto);
+
+      // createBoardDto.member.push(user.id);
+      return await this.boardService.createBoard(createBoardDto);
+    } catch (error) {
+      return { message: `${error}` };
+    }
   }
 
-  @Get()
-  findAll() {
-    return this.boardService.findAll();
+  // @UseGuards(AuthGuard())
+  // @Get()
+  // async findAllBoards() {
+  //   @userInfo user: User
+  //   try {
+  //     return await this.userService.findAllBoardByuserId(user.id);
+  //   } catch (error) {
+  //     return { message: `${error}` };
+  //   }
+  // }
+
+  // @UseGuards(AuthGuard())
+  @Get('/:boardId')
+  async findBoardById(@Param('boardId') boardId: number) {
+    try {
+      return await this.boardService.findBoardById(boardId);
+    } catch (error) {
+      return { message: `${error}` };
+    }
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.boardService.findOne(+id);
+  // @UseGuards(AuthGuard())
+  @Patch('/:boardId')
+  async editBoard(
+    @Param('boardId') boardId: number,
+    @Body() updateBoardDto: UpdateBoardDto,
+  ) {
+    try {
+      await this.boardService.editBoard(boardId, updateBoardDto);
+
+      return { message: '해당 보드를 수정하였습니다.' };
+    } catch (error) {
+      return { message: `${error}` };
+    }
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBoardDto: UpdateBoardDto) {
-    return this.boardService.update(+id, updateBoardDto);
-  }
+  // @UseGuards(AuthGuard())
+  @Delete('/:boardId')
+  async deleteBoard(@Param('boardId') boardId: number) {
+    try {
+      await this.boardService.deleteBoard(boardId);
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.boardService.remove(+id);
+      return { message: '해당 보드를 삭제하였습니다.' };
+    } catch (error) {
+      return { message: `${error}` };
+    }
   }
 }
