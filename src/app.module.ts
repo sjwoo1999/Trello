@@ -20,6 +20,7 @@ const typeOrmModuleOptions = {
   useFactory: async (
     configService: ConfigService,
   ): Promise<TypeOrmModuleOptions> => ({
+<<<<<<< HEAD
     type: 'mysql',
     host: configService.get('DB_HOST'),
     port: configService.get('DB_PORT'),
@@ -28,6 +29,16 @@ const typeOrmModuleOptions = {
     database: configService.get('DB_NAME'),
     entities: [User, Board, Columns, Card, Comment],
     synchronize: configService.get('DB_SYNC'),
+=======
+    type: "mysql",
+    host: configService.get("DB_HOST"),
+    port: configService.get("DB_PORT"),
+    username: configService.get("DB_USERNAME"),
+    password: configService.get("DB_PASSWORD"),
+    database: configService.get("DB_NAME"),
+    entities: [User, Board, Columns, Card, Comment],
+    synchronize: configService.get("DB_SYNC"),
+>>>>>>> 3ab3ae6c4d71575f1fcad046cb71ac6a9f90fc30
     logging: true,
   }),
   inject: [ConfigService],
@@ -45,6 +56,8 @@ const typeOrmModuleOptions = {
         DB_PASSWORD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
         DB_SYNC: Joi.boolean().required(),
+        PASSWORD_HASH_ROUNDS: Joi.number().required(),
+        ROLE_ADMIN_PASSWORD: Joi.string().required()
       }),
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),

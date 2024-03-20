@@ -5,7 +5,6 @@ import {
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
-  Unique,
 } from 'typeorm';
 import { Role } from '../types/user.type';
 import { Card } from 'src/card/entities/card.entity';
@@ -13,9 +12,8 @@ import { Comment } from 'src/comment/entities/comment.entity';
 import { Board } from 'src/board/entities/board.entity';
 
 @Entity({ name: 'users' })
-@Unique(['email'])
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
   @IsString()
@@ -24,7 +22,7 @@ export class User {
   name: string;
 
   @IsEmail()
-  @Column({ type: 'varchar', length: 30, nullable: false })
+  @Column({ type: 'varchar', length: 30, nullable: false, unique: true })
   @IsNotEmpty({ message: '이메일을 입력해주세요.' })
   email: string;
 

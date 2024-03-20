@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsObject, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -19,10 +19,6 @@ export class Board {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @IsObject()
-  @Column({ type: 'json' })
-  member: number[];
-
   @IsString()
   @Column({ type: 'varchar', length: 30, nullable: false })
   @IsNotEmpty({ message: '제목을 입력해주세요.' })
@@ -41,6 +37,9 @@ export class Board {
   @Column({ type: 'enum', enum: Visibility, nullable: false })
   @IsNotEmpty({ message: '공개 범위를 선택해주세요.' })
   visibility: Visibility;
+
+  @Column({ type: 'json', nullable: false })
+  member: number[];
 
   @CreateDateColumn()
   createdAt: Date;
