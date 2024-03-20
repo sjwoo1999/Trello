@@ -3,8 +3,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
-  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -12,7 +10,6 @@ import {
 import { Color } from '../types/color.type';
 import { Visibility } from '../types/visibility.type';
 import { Columns } from 'src/column/entities/column.entity';
-import { User } from 'src/user/entities/user.entity';
 
 @Entity({ name: 'boards' })
 export class Board {
@@ -46,10 +43,6 @@ export class Board {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @ManyToMany(() => User, (user) => user.boards)
-  @JoinColumn({ name: 'member', referencedColumnName: 'id' })
-  users: User[];
 
   @OneToMany(() => Columns, (column) => column.board)
   columns: Columns[];

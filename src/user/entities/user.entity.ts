@@ -1,15 +1,8 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import {
-  Column,
-  Entity,
-  ManyToMany,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Role } from '../types/user.type';
 import { Card } from 'src/card/entities/card.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
-import { Board } from 'src/board/entities/board.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -34,9 +27,6 @@ export class User {
   @IsEnum(Role)
   @Column({ type: 'enum', enum: Role, default: Role.user })
   role: Role;
-
-  @ManyToMany(() => Board, (board) => board.users)
-  boards: Board[];
 
   @OneToMany(() => Card, (card) => card.user)
   cards: Card[];
