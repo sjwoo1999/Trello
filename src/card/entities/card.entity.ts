@@ -20,7 +20,7 @@ export class Card {
   order: number;
 
   @IsNumber()
-  @Column({ type: 'int', nullable: false })
+  @Column({ type: 'int', unsigned: true })
   userId: number;
   
   @IsString()

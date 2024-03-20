@@ -2,8 +2,8 @@ import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Color } from '../types/color.type';
 import { Visibility } from '../types/visibility.type';
-import { Member } from 'src/member/entities/member.entity';
 import { Columns } from 'src/column/entities/column.entity';
+import { array } from 'joi';
 
 @Entity({ name: 'boards' })
 export class Board {
@@ -29,14 +29,15 @@ export class Board {
   @IsNotEmpty({ message: "공개 범위를 선택해주세요." })
   visibility: Visibility;
 
+  @Column({ type: 'json', nullable: false })
+  member : JSON;
+
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Member, (member) => member.board)
-  members: Member[];
 
   @OneToMany(() => Columns, (column) => column.board)
   columns: Columns[];
