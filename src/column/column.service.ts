@@ -20,7 +20,7 @@ export class ColumnService {
       order = 0;
     } else {
       columns.map((column) => {
-        order = Math.max(column.order);
+        order = Math.max(column.order) + 1;
       });
     }
     createColumnDto.order = order;
@@ -32,10 +32,6 @@ export class ColumnService {
 
   async findAllColumns(boardId: number) {
     const columns = await this.columnRepository.findBy({ boardId });
-
-    if (!columns) {
-      throw new NotFoundException('컬럼을 찾을 수 없습니다.');
-    }
 
     return columns;
   }
@@ -53,8 +49,19 @@ export class ColumnService {
   async editColumn(columnId: number, updateColumnDto: UpdateColumnDto) {
     const column = await this.findColumn(columnId);
 
-    await this.columnRepository.update(column, updateColumnDto);
+    const editColumn = await this.columnRepository.update(
+      column,
+      updateColumnDto,
+    );
 
-    return { message: '해당 컬럼을 수정하였습니다.' };
+    return editColumn;
+  }
+
+  async deleteColumn(columnId: number) {
+    const column = await this.findColumn(columnId);
+
+    const deleteColumn = await this.columnRepository.delete(column);
+
+    return deleteColumn;
   }
 }

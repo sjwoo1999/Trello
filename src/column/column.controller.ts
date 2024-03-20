@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Delete,
+} from '@nestjs/common';
 import { ColumnService } from './column.service';
 import { CreateColumnDto } from './dto/create-column.dto';
 import { BoardService } from 'src/board/board.service';
@@ -53,6 +61,25 @@ export class ColumnController {
       await this.boardService.findBoardById(boardId);
 
       await this.columnService.editColumn(columnId, updateColumnDto);
+
+      return { message: '해당 컬럼을 수정하였습니다.' };
+    } catch (error) {
+      return { message: `${error}` };
+    }
+  }
+
+  // @UseGuards(AuthGuard())
+  @Delete('/:columnId')
+  async deleteColumn(
+    @Param('boardId') boardId: number,
+    @Param('columnId') columnId: number,
+  ) {
+    try {
+      await this.boardService.findBoardById(boardId);
+
+      await this.columnService.deleteColumn(columnId);
+
+      return { message: '해당 컬럼을 삭제하였습니다,' };
     } catch (error) {
       return { message: `${error}` };
     }
