@@ -29,11 +29,12 @@ export class BoardService {
   async editBoard(boardId: number, updateBoardDto: UpdateBoardDto) {
     await this.findBoardById(boardId);
 
-    const editBoard = await this.boardRepository.update(
-      { id: boardId },
-      updateBoardDto,
-    );
+    return await this.boardRepository.update({ id: boardId }, updateBoardDto);
+  }
 
-    return editBoard;
+  async deleteBoard(boardId: number) {
+    await this.findBoardById(boardId);
+
+    return await this.boardRepository.delete({ id: boardId });
   }
 }

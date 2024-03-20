@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { BoardService } from './board.service';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { validate } from 'class-validator';
@@ -52,7 +60,21 @@ export class BoardController {
     @Body() updateBoardDto: UpdateBoardDto,
   ) {
     try {
-      return await this.boardService.editBoard(boardId, updateBoardDto);
+      await this.boardService.editBoard(boardId, updateBoardDto);
+
+      return { message: '해당 보드를 수정하였습니다.' };
+    } catch (error) {
+      return { message: `${error}` };
+    }
+  }
+
+  // @UseGuards(AuthGuard())
+  @Delete('/:boardId')
+  async deleteBoard(@Param('boardId') boardId: number) {
+    try {
+      await this.boardService.deleteBoard(boardId);
+
+      return { message: '해당 보드를 삭제하였습니다.' };
     } catch (error) {
       return { message: `${error}` };
     }
