@@ -1,4 +1,4 @@
-import { IsArray, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsObject, IsString } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -19,8 +19,8 @@ export class Board {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @IsArray()
-  @Column({ type: 'array' })
+  @IsObject()
+  @Column({ type: 'json' })
   member: number[];
 
   @IsString()

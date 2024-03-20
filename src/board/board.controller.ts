@@ -37,7 +37,7 @@ export class BoardController {
   // async findAllBoards() {
   //   @userInfo user: User
   //   try {
-  //     return boards;
+  //     return await this.userService.findAllBoardByuserId(user.id);
   //   } catch (error) {
   //     return { message: `${error}` };
   //   }

@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { ColumnService } from './column.service';
 import { CreateColumnDto } from './dto/create-column.dto';
@@ -83,5 +84,17 @@ export class ColumnController {
     } catch (error) {
       return { message: `${error}` };
     }
+  }
+
+  // @UseGuards(AuthGuard())
+  @Put('/:columnId')
+  async changeOrderColumn(
+    @Param('boardId') boardId: number,
+    @Param('columnId') columnId: number,
+    @Body() order: number,
+  ) {
+    await this.boardService.findBoardById(boardId);
+
+    return await this.columnService.changeOrderColumn(boardId, columnId, order);
   }
 }
