@@ -7,26 +7,19 @@ import { UpdateMemberDto } from './dto/update-member.dto';
 export class MemberController {
   constructor(private readonly memberService: MemberService) {}
 
+  //멤버 초대
   @Post()
   create(@Body() createMemberDto: CreateMemberDto) {
     return this.memberService.create(createMemberDto);
   }
 
+  //멤버 리스트 조회
   @Get()
   findAll() {
     return this.memberService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.memberService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMemberDto: UpdateMemberDto) {
-    return this.memberService.update(+id, updateMemberDto);
-  }
-
+  //멤버 탈퇴시키기 혹은 자기자신 탈퇴.
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.memberService.remove(+id);

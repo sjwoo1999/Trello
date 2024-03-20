@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "type": "chrome",
+            "name": "http://localhost:3000/user/sign-up",
+            "request": "launch",
+            "url": "http://localhost:3000/user/sign-up"
+        }
+    ]
+}

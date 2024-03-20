@@ -13,7 +13,7 @@ export class Comment {
   cardId: number;
 
   @IsNumber()
-  @Column({ type: 'int', nullable: false })
+  @Column({ type: 'int', unsigned: true })
   userId: number;
 
   @IsString()
@@ -27,8 +27,8 @@ export class Comment {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.comments)
-  @JoinColumn({ name: "userId", referencedColumnName: "id" })
+  @ManyToOne(() => User, (user) => user.comments, {onDelete:'CASCADE'})
+  @JoinColumn({ name: "userId", referencedColumnName: "id"})
   user: User;
 
   @ManyToOne(() => Card, (card) => card.comments)
