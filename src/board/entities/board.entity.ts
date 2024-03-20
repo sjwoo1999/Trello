@@ -20,6 +20,7 @@ export class Board {
   id: number;
 
   @IsArray()
+  @Column({ type: 'array' })
   member: number[];
 
   @IsString()

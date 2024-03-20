@@ -36,7 +36,7 @@ export class ColumnService {
     return columns;
   }
 
-  async findColumn(id: number) {
+  async findColumnById(id: number) {
     const column = await this.columnRepository.findOneBy({ id });
 
     if (!column) {
@@ -47,7 +47,7 @@ export class ColumnService {
   }
 
   async editColumn(columnId: number, updateColumnDto: UpdateColumnDto) {
-    const column = await this.findColumn(columnId);
+    const column = await this.findColumnById(columnId);
 
     const editColumn = await this.columnRepository.update(
       column,
@@ -58,7 +58,7 @@ export class ColumnService {
   }
 
   async deleteColumn(columnId: number) {
-    const column = await this.findColumn(columnId);
+    const column = await this.findColumnById(columnId);
 
     const deleteColumn = await this.columnRepository.delete(column);
 
