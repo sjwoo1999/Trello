@@ -32,9 +32,9 @@ export class User {
   @OneToMany(() => Card, (card) => card.user)
   cards: Card[];
 
-  @OneToMany(() => Comment, (comment) => comment.user)
+  @OneToMany(() => Comment, (comment) => comment.user, { cascade: true })
   comments: Comment[];
 
-  @OneToMany(() => Member, (member) => member.user)
+  @OneToMany(() => Member, (member) => member.user, { cascade: true })
   members: Member[];
 }
