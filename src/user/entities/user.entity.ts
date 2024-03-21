@@ -7,7 +7,7 @@ import { Member } from 'src/member/entities/member.entity';
 
 @Entity({ name: 'users' })
 export class User {
-  @PrimaryGeneratedColumn({ unsigned: true })
+  @PrimaryGeneratedColumn()
   id: number;
 
   @IsString()

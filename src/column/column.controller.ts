@@ -7,13 +7,16 @@ import {
   Patch,
   Delete,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { ColumnService } from './column.service';
 import { CreateColumnDto } from './dto/create-column.dto';
 import { BoardService } from 'src/board/board.service';
 import { validate } from 'class-validator';
 import { UpdateColumnDto } from './dto/update-column.dto';
+import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('/board/:boardId/column')
 export class ColumnController {
   constructor(
@@ -21,7 +24,6 @@ export class ColumnController {
     private readonly boardService: BoardService,
   ) {}
 
-  // @UseGuards(AuthGuard())
   @Post()
   async createColumn(
     @Param('boardId') boardId: number,
@@ -30,38 +32,35 @@ export class ColumnController {
     try {
       await validate(createColumn);
 
-      await this.boardService.findBoardById(boardId);
-      createColumn.boardId = boardId;
+      await this.boardService.findBoardById(+boardId);
+      createColumn.boardId = +boardId;
 
-      await this.columnService.createColumn(createColumn);
+      return await this.columnService.createColumn(createColumn);
     } catch (error) {
       return { message: `${error}` };
     }
   }
 
-  // @UseGuards(AuthGuard())
   @Get()
   async findAllColumns(@Param('boardId') boardId: number) {
     try {
-      await this.boardService.findBoardById(boardId);
+      await this.boardService.findBoardById(+boardId);
 
-      await this.columnService.findAllColumns(boardId);
+      return await this.columnService.findAllColumns(+boardId);
     } catch (error) {
       return { message: `${error}` };
     }
   }
 
-  // @UseGuards(AuthGuard())
   @Patch('/:columnId')
   async editColumn(
-    @Param('boardId') boardId: number,
-    @Param('columnId') columnId: number,
+    @Param() params: { boardId: number; columnId: number },
     @Body() updateColumnDto: UpdateColumnDto,
   ) {
     try {
-      await this.boardService.findBoardById(boardId);
+      await this.boardService.findBoardById(params.boardId);
 
-      await this.columnService.editColumn(columnId, updateColumnDto);
+      await this.columnService.editColumn(params.columnId, updateColumnDto);
 
       return { message: '해당 컬럼을 수정하였습니다.' };
     } catch (error) {
@@ -69,32 +68,31 @@ export class ColumnController {
     }
   }
 
-  // @UseGuards(AuthGuard())
   @Delete('/:columnId')
-  async deleteColumn(
-    @Param('boardId') boardId: number,
-    @Param('columnId') columnId: number,
-  ) {
+  async deleteColumn(@Param() params: { boardId: number; columnId: number }) {
     try {
-      await this.boardService.findBoardById(boardId);
+      await this.boardService.findBoardById(params.boardId);
 
-      await this.columnService.deleteColumn(columnId);
-
-      return { message: '해당 컬럼을 삭제하였습니다,' };
+      return await this.columnService.deleteColumn(
+        params.boardId,
+        params.columnId,
+      );
     } catch (error) {
       return { message: `${error}` };
     }
   }
 
-  // @UseGuards(AuthGuard())
   @Put('/:columnId')
   async changeOrderColumn(
-    @Param('boardId') boardId: number,
-    @Param('columnId') columnId: number,
+    @Param() params: { boardId: number; columnId: number },
     @Body() order: number,
   ) {
-    await this.boardService.findBoardById(boardId);
+    await this.boardService.findBoardById(params.boardId);
 
-    return await this.columnService.changeOrderColumn(boardId, columnId, order);
+    return await this.columnService.changeOrderColumn(
+      params.boardId,
+      params.columnId,
+      order,
+    );
   }
 }
