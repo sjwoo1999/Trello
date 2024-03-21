@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { MemberService } from './member.service';
 import { EmailMemberDto } from './dto/email-member.dto';
 import { BoardIdMemberDto } from './dto/boardId-member.dto';
+import { Role } from './types/role.type';
 
 @Controller('member')
 export class MemberController {
