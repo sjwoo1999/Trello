@@ -1,3 +1,5 @@
 export class BoardIdMemberDto {
-    boardId: number;
+  [x: string]: any;
+  boardId: number;
+  userId: number;
 }
