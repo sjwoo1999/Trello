@@ -3,6 +3,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Role } from '../types/user.type';
 import { Card } from 'src/card/entities/card.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
+import { Member } from 'src/member/entities/member.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -33,4 +34,7 @@ export class User {
 
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
+
+  @OneToMany(() => Member, (member) => member.user)
+  members: Member[];
 }
