@@ -21,7 +21,7 @@ export class Comment {
   cardId: number;
 
   @IsNumber()
-  @Column({ type: 'int', unsigned: true })
+  @Column({ type: 'int'})
   userId: number;
 
   @IsString()

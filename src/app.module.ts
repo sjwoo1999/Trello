@@ -15,11 +15,22 @@ import { Board } from './board/entities/board.entity';
 import { Columns } from './column/entities/column.entity';
 import { Card } from './card/entities/card.entity';
 import { Comment } from './comment/entities/comment.entity';
+import { Member } from './member/entities/member.entity';
 
 const typeOrmModuleOptions = {
   useFactory: async (
     configService: ConfigService,
   ): Promise<TypeOrmModuleOptions> => ({
+<<<<<<< HEAD
+    type: "mysql",
+    host: configService.get("DB_HOST"),
+    port: configService.get("DB_PORT"),
+    username: configService.get("DB_USERNAME"),
+    password: configService.get("DB_PASSWORD"),
+    database: configService.get("DB_NAME"),
+    entities: [User, Member, Board, Columns, Card, Comment],
+    synchronize: configService.get("DB_SYNC"),
+=======
     type: 'mysql',
     host: configService.get('DB_HOST'),
     port: configService.get('DB_PORT'),
@@ -28,6 +39,7 @@ const typeOrmModuleOptions = {
     database: configService.get('DB_NAME'),
     entities: [User, Board, Columns, Card, Comment],
     synchronize: configService.get('DB_SYNC'),
+>>>>>>> 12c15e2321babe86b3aadb1ccbdd448df978fff0
     logging: true,
   }),
   inject: [ConfigService],

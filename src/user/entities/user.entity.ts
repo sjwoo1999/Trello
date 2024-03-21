@@ -3,10 +3,11 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Role } from '../types/user.type';
 import { Card } from 'src/card/entities/card.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
+import { Member } from 'src/member/entities/member.entity';
 
 @Entity({ name: 'users' })
 export class User {
-  @PrimaryGeneratedColumn({ unsigned: true })
+  @PrimaryGeneratedColumn()
   id: number;
 
   @IsString()
@@ -31,6 +32,9 @@ export class User {
   @OneToMany(() => Card, (card) => card.user)
   cards: Card[];
 
-  @OneToMany(() => Comment, (comment) => comment.user)
+  @OneToMany(() => Comment, (comment) => comment.user, {cascade: true})
   comments: Comment[];
+
+  @OneToMany(() => Member, (member) => member.user, {cascade: true})
+  members: Member[];
 }
