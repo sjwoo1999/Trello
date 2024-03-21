@@ -32,17 +32,6 @@ export class BoardController {
   }
 
   // @UseGuards(AuthGuard())
-  // @Get()
-  // async findAllBoards() {
-  //   @userInfo user: User
-  //   try {
-  //     return await this.userService.findAllBoardByuserId(user.id);
-  //   } catch (error) {
-  //     return { message: `${error}` };
-  //   }
-  // }
-
-  // @UseGuards(AuthGuard())
   @Get('/:boardId')
   async findBoardById(@Param('boardId') boardId: number) {
     try {
