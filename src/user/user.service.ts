@@ -73,19 +73,56 @@ export class UserService {
         return user;
     }
 
-    async patchUser(userId: number, {name, email, password, newPassword, newPasswordConfirm}:PatchUserDto){
-        const user = await this.getUser(userId)
-        user.name = name ?? user.name; 
-        user.email = email ?? user.email;
-        if (password === newPassword || newPassword !== newPasswordConfirm){
-            throw new BadRequestException('바꿀 비밀번호 값이 기존과 같거나, 확인값이 다릅니다.')
+    async patchUser(userId: number, { name, email, password, newPassword, newPasswordConfirm, rolePassword }: PatchUserDto) {
+        const user = await this.userRepository.findOne({
+            where: { id: userId },
+            select: { id: true, name: true, email: true, password: true, role: true },
+        });
+            
+        if (!user) {
+            throw new NotFoundException('사용자를 찾을 수 없습니다.');
         }
-        user.password = newPassword;
-        await this.userRepository.update({id : userId}, {
-            name: user.name,
-            email: user.email,
-            password: user.password
-        })
+    
+        if (email && email !== user.email) {
+            const existingUser = await this.userRepository.findOne({ where: { email, id: userId } });
+            if (existingUser) {
+                throw new BadRequestException('이미 사용 중인 이메일 주소입니다.');
+            }
+            user.email = email;
+        }
+    
+        user.name = name ?? user.name;
+    
+        if (newPassword || newPasswordConfirm) {
+            if (newPassword !== newPasswordConfirm) {
+                throw new BadRequestException('새로운 비밀번호와 새로운 비밀번호 확인 값이 다릅니다.');
+            }
+    
+            const hashRounds = this.configService.get<number>('PASSWORD_HASH_ROUNDS');
+            const isPasswordMatched = bcrypt.compareSync(password, user.password);
+    
+            if (!isPasswordMatched) {
+                throw new BadRequestException('기존 비밀번호가 올바르지 않습니다.');
+            }
+    
+            const newHashedPassword = bcrypt.hashSync(newPassword, hashRounds);
+            user.password = newHashedPassword;
+        }
+
+        if (user.role === 1){
+            user.role = rolePassword === this.configService.get<string>('ROLE_ADMIN_PASSWORD') ? 0 : 1;
+        }
+
+        const checkUser = await this.userRepository.findOne({
+            where: { id: userId },
+            select: { id: true, name: true, email: true, password: true, role: true },
+        });
+        const isPasswordNotChanged = bcrypt.compareSync(password, checkUser.password);
+        if (user.name===checkUser.name && user.email===checkUser.email && isPasswordNotChanged && user.role===checkUser.role){
+            throw new BadRequestException('변경된 값이 없습니다.');
+        }
+
+        await this.userRepository.save(user);
     }
 
     async deleteUser(userId: number){

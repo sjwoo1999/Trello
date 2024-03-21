@@ -1,26 +1,44 @@
 import { Injectable } from '@nestjs/common';
-import { CreateMemberDto } from './dto/create-member.dto';
-import { UpdateMemberDto } from './dto/update-member.dto';
+import { EmailMemberDto } from './dto/email-member.dto';
+import { BoardIdMemberDto } from './dto/boardId-member.dto';
+import { Repository } from 'typeorm';
+import { Member } from './entities/member.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class MemberService {
-  create(createMemberDto: CreateMemberDto) {
-    return 'This action adds a new member';
+  constructor(@InjectRepository(Member) private readonly memberRepository:Repository<Member>){}
+  invite(emailMemberDto:EmailMemberDto) {
+
   }
 
-  findAll() {
-    return `This action returns all member`;
+  boardCanAccess() {
+
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} member`;
+  accessMembers(boardMemberDto:BoardIdMemberDto) {
+
   }
 
-  update(id: number, updateMemberDto: UpdateMemberDto) {
-    return `This action updates a #${id} member`;
+  patchMemberRole(emailMemberDto:EmailMemberDto) {
+
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} member`;
+  boardOut(boardMemberDto:BoardIdMemberDto) {
+
+  }
+
+  boardKick(emailMemberDto:EmailMemberDto) {
+
+  }
+
+
+  searchUser(){
+
+  }
+
+
+  isJoinBoard(){
+
   }
 }

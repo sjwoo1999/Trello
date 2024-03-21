@@ -16,6 +16,7 @@ import { Board } from './board/entities/board.entity';
 import { Columns } from './column/entities/column.entity';
 import { Card } from './card/entities/card.entity';
 import { Comment } from './comment/entities/comment.entity';
+import { Member } from './member/entities/member.entity';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -27,7 +28,7 @@ const typeOrmModuleOptions = {
     username: configService.get("DB_USERNAME"),
     password: configService.get("DB_PASSWORD"),
     database: configService.get("DB_NAME"),
-    entities: [User, Board, Columns, Card, Comment],
+    entities: [User, Member, Board, Columns, Card, Comment],
     synchronize: configService.get("DB_SYNC"),
     logging: true,
   }),
