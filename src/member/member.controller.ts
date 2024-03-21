@@ -1,8 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Delete } from '@nestjs/common';
 import { MemberService } from './member.service';
 import { EmailMemberDto } from './dto/email-member.dto';
 import { BoardIdMemberDto } from './dto/boardId-member.dto';
-import { Role } from './types/role.type';
 
 @Controller('member')
 export class MemberController {
@@ -12,7 +11,7 @@ export class MemberController {
 
   //멤버 초대
   @Post()
-  invite(@Body() emailMemberDto:EmailMemberDto) {
+  invite(@Body() emailMemberDto: EmailMemberDto) {
     return this.memberService.invite(emailMemberDto);
   }
 
@@ -24,25 +23,25 @@ export class MemberController {
 
   //멤버 리스트 조회
   @Get()
-  accessMembers(boardMemberDto:BoardIdMemberDto) {
+  accessMembers(boardMemberDto: BoardIdMemberDto) {
     return this.memberService.accessMembers(boardMemberDto);
   }
 
   // 권한 +-인가
   @Patch()
-  patchMemberRole(emailMemberDto:EmailMemberDto) {
+  patchMemberRole(emailMemberDto: EmailMemberDto) {
     return this.memberService.patchMemberRole(emailMemberDto);
   }
 
   //보드 탈퇴.
   @Delete(':id')
-  boardOut(boardMemberDto:BoardIdMemberDto) {
+  boardOut(boardMemberDto: BoardIdMemberDto) {
     return this.memberService.boardOut(boardMemberDto);
   }
 
   //멤버 강퇴
   @Delete(':id')
-  boardKick(emailMemberDto:EmailMemberDto) {
+  boardKick(emailMemberDto: EmailMemberDto) {
     return this.memberService.boardKick(emailMemberDto);
   }
 }

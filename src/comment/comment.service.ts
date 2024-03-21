@@ -25,12 +25,11 @@ export class CommentService {
     }
   }
 
-  // // 보드에 초대된 멤버인지 확인하는 메서드
-  // private isMemberOfBoard(member: BoardIdMemberDto): boolean {
-  //   // 보드에 초대된 멤버라고 가정
-  //   // 보드에 속한 멤버들의 목록을 확인해야 하는데 모르겠음 ㅠ
-  //   return true;
-  // }
+  // 보드에 초대된 멤버인지 확인하는 메서드
+  private isMemberOfBoard(member: BoardIdMemberDto): boolean {
+    // 보드에 속한 멤버들의 목록을 확인해야 하는데 모르겠음 ㅠ
+    return true;
+  }
 
   // 댓글 조회 메서드
   findAll(): any[] {

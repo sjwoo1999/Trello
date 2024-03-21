@@ -17,7 +17,7 @@ export class ColumnService {
     const columns = await this.findAllColumns(createColumnDto.boardId);
     let order = 0;
 
-    if (!columns) {
+    if (columns.length === 0) {
       order = 0;
     } else {
       columns.map((column) => {
@@ -58,12 +58,41 @@ export class ColumnService {
     return editColumn;
   }
 
-  async deleteColumn(columnId: number) {
-    const column = await this.findColumnById(columnId);
+  async deleteColumn(boardId: number, columnId: number) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    const deleteColumn = await this.columnRepository.delete(column);
+    try {
+      const column = await this.findColumnById(columnId);
+      const columns = await this.findAllColumns(boardId);
 
-    return deleteColumn;
+      const reorderColumns = await this.deleteReorder(columns, column.order);
+
+      console.log(reorderColumns);
+      await queryRunner.manager.delete(Columns, column);
+      await queryRunner.manager.save(Columns, reorderColumns);
+
+      await queryRunner.commitTransaction();
+
+      return { message: '해당 컬럼을 삭제하였습니다.' };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      return { message: `${error}` };
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async deleteReorder(columns: Columns[], order: number) {
+    const reorderColumns = columns.map((column) => {
+      if (column.order > order) {
+        return { ...column, order: column.order - 1 };
+      } else {
+      }
+    });
+
+    return reorderColumns;
   }
 
   async changeOrderColumn(boardId: number, columnId: number, order: number) {
@@ -79,10 +108,9 @@ export class ColumnService {
 
       await queryRunner.manager.save(Columns, reorderColumns);
 
-      const changeOrderColumns = await this.findAllColumns(boardId);
       await queryRunner.commitTransaction();
 
-      return changeOrderColumns;
+      return;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       return { message: `${error}` };
