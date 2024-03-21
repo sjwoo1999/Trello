@@ -16,7 +16,18 @@ export class CardService {
     // User? Member Service Inject 해줘야 한다.
   ) {}
 
+  // 마감일이 시작일 이전인지 또는 마감일이 오늘 이전인지 확인(지정된 경우).
   async create(createCardDto: CreateCardDto, userId: number, columnId: number) {
+    if (
+      createCardDto.startDate &&
+      createCardDto.endDate &&
+      (createCardDto.endDate < createCardDto.startDate ||
+        createCardDto.endDate < new Date())
+    ) {
+      throw new BadRequestException(
+        '마감일은 시작일 이후이거나 오늘 이후여야 합니다.',
+      );
+    }
     const findCards = await this.cardRepository.find({
       where: {
         column: {
