@@ -11,5 +11,6 @@ import { User } from 'src/user/entities/user.entity';
   imports: [TypeOrmModule.forFeature([Member]), PassportModule, JwtAuthGuard, User],
   controllers: [MemberController],
   providers: [MemberService],
+  exports: [TypeOrmModule],
 })
 export class MemberModule {}

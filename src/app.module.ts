@@ -21,6 +21,7 @@ const typeOrmModuleOptions = {
   useFactory: async (
     configService: ConfigService,
   ): Promise<TypeOrmModuleOptions> => ({
+<<<<<<< HEAD
     type: "mysql",
     host: configService.get("DB_HOST"),
     port: configService.get("DB_PORT"),
@@ -29,6 +30,16 @@ const typeOrmModuleOptions = {
     database: configService.get("DB_NAME"),
     entities: [User, Member, Board, Columns, Card, Comment],
     synchronize: configService.get("DB_SYNC"),
+=======
+    type: 'mysql',
+    host: configService.get('DB_HOST'),
+    port: configService.get('DB_PORT'),
+    username: configService.get('DB_USERNAME'),
+    password: configService.get('DB_PASSWORD'),
+    database: configService.get('DB_NAME'),
+    entities: [User, Board, Columns, Card, Comment, Member],
+    synchronize: configService.get('DB_SYNC'),
+>>>>>>> 29da980e63770153d00690220cc5135d5426af4a
     logging: true,
   }),
   inject: [ConfigService],

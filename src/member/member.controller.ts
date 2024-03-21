@@ -5,7 +5,6 @@ import { Role } from './types/role.type';
 import { RoleGuard } from './guards/role.guard';
 import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 import { Roles } from './decorators/role.decorator';
-import { PatchUserDto } from 'src/user/dtos/patchUser.dto';
 import { PatchRoleDto } from './dto/updateRole.dto';
 
 @UseGuards(JwtAuthGuard)

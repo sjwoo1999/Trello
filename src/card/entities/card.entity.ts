@@ -35,7 +35,7 @@ export class Card {
   order: number;
 
   @IsNumber()
-  @Column({ type: 'int'})
+  @Column({ type: 'int' })
   userId: number;
 
   @IsString()
