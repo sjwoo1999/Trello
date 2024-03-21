@@ -34,7 +34,7 @@ export class UserController {
     @UseGuards(JwtAuthGuard)
     @Get('/user')
     async getUser(@Request() req){
-        const userId = req.user.id;
+        const userId = req.user.id; //
         const data = await this.userService.getUser(userId);
         return {
             statusCode: HttpStatus.OK,
