@@ -6,44 +6,28 @@ import {
   Param,
   Patch,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { BoardService } from './board.service';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { validate } from 'class-validator';
 import { UpdateBoardDto } from './dto/update-board.dto';
+import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('board')
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
-  // @UseGuards(AuthGuard())
   @Post()
-  async createBoard(
-    @Body() createBoardDto: CreateBoardDto,
-    // @userInfo user: User
-  ) {
-    try {
-      await validate(createBoardDto);
+  async createBoard(@Body() createBoardDto: CreateBoardDto, @Req() req: any) {
+    await validate(createBoardDto);
 
-      // createBoardDto.member.push(user.id);
-      return await this.boardService.createBoard(createBoardDto);
-    } catch (error) {
-      return { message: `${error}` };
-    }
+    const userId = req.user;
+    return await this.boardService.createBoard(createBoardDto, userId);
   }
 
-  // @UseGuards(AuthGuard())
-  // @Get()
-  // async findAllBoards() {
-  //   @userInfo user: User
-  //   try {
-  //     return await this.userService.findAllBoardByuserId(user.id);
-  //   } catch (error) {
-  //     return { message: `${error}` };
-  //   }
-  // }
-
-  // @UseGuards(AuthGuard())
   @Get('/:boardId')
   async findBoardById(@Param('boardId') boardId: number) {
     try {
@@ -53,7 +37,6 @@ export class BoardController {
     }
   }
 
-  // @UseGuards(AuthGuard())
   @Patch('/:boardId')
   async editBoard(
     @Param('boardId') boardId: number,
@@ -68,7 +51,6 @@ export class BoardController {
     }
   }
 
-  // @UseGuards(AuthGuard())
   @Delete('/:boardId')
   async deleteBoard(@Param('boardId') boardId: number) {
     try {

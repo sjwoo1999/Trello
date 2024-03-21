@@ -9,5 +9,6 @@ import { PassportModule } from '@nestjs/passport';
   imports: [TypeOrmModule.forFeature([Member]), PassportModule],
   controllers: [MemberController],
   providers: [MemberService],
+  exports: [TypeOrmModule],
 })
 export class MemberModule {}

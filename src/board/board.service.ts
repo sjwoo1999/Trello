@@ -1,15 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Board } from './entities/board.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
+import { Member } from 'src/member/entities/member.entity';
 
 @Injectable()
 export class BoardService {
   constructor(
     @InjectRepository(Board)
     private readonly boardRepository: Repository<Board>,
+    private dataSource: DataSource,
   ) {}
 
   async findBoardById(id: number) {
@@ -22,8 +24,29 @@ export class BoardService {
     return board;
   }
 
-  async createBoard(createBoardDto: CreateBoardDto) {
-    return await this.boardRepository.save(createBoardDto);
+  async createBoard(createBoardDto: CreateBoardDto, userId: number) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const board = await queryRunner.manager.save(Board, createBoardDto);
+
+      await queryRunner.manager.save(Member, {
+        userId: userId,
+        boardId: board.id,
+        role: 0,
+      });
+
+      await queryRunner.commitTransaction();
+
+      return { message: '보드가 생성되었습니다.' };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      return { message: `${error}` };
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async editBoard(boardId: number, updateBoardDto: UpdateBoardDto) {
