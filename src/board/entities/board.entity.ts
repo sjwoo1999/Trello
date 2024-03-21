@@ -36,16 +36,13 @@ export class Board {
   @IsNotEmpty({ message: '공개 범위를 선택해주세요.' })
   visibility: Visibility;
 
-  @Column({ type: 'json', nullable: false })
-  member: number[];
-
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Columns, (column) => column.board)
+  @OneToMany(() => Columns, (column) => column.board, { cascade: true })
   columns: Columns[];
 
   @OneToMany(() => Member, (member) => member.board, { cascade: true })
