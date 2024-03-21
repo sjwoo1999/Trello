@@ -32,7 +32,10 @@ export class ColumnService {
   }
 
   async findAllColumns(boardId: number) {
-    const columns = await this.columnRepository.findBy({ boardId });
+    const columns = await this.columnRepository.find({
+      where: { boardId: boardId },
+      order: { order: 'ASC' },
+    });
 
     return columns;
   }
@@ -69,7 +72,7 @@ export class ColumnService {
 
       const reorderColumns = await this.deleteReorder(columns, column.order);
 
-      console.log(reorderColumns);
+      console.log('--------', reorderColumns);
       await queryRunner.manager.delete(Columns, column);
       await queryRunner.manager.save(Columns, reorderColumns);
 
@@ -85,13 +88,9 @@ export class ColumnService {
   }
 
   async deleteReorder(columns: Columns[], order: number) {
-    const reorderColumns = columns.map((column) => {
-      if (column.order > order) {
-        return { ...column, order: column.order - 1 };
-      } else {
-      }
-    });
-
+    const reorderColumns = columns
+      .filter((column) => column.order > order)
+      .map((column) => ({ ...column, order: column.order - 1 }));
     return reorderColumns;
   }
 
@@ -110,7 +109,9 @@ export class ColumnService {
 
       await queryRunner.commitTransaction();
 
-      return;
+      const newColumns = await this.findAllColumns(boardId);
+
+      return newColumns;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       return { message: `${error}` };
@@ -127,15 +128,19 @@ export class ColumnService {
         } else if (column.order === order) {
           return { ...column, order: reorder };
         }
+        return null;
       } else {
         if (column.order > order && column.order <= reorder) {
           return { ...column, order: column.order - 1 };
         } else if (column.order === order) {
           return { ...column, order: reorder };
         }
+        return null;
       }
     });
 
-    return reorderColumns;
+    const newColumns = reorderColumns.filter((column) => column !== null);
+
+    return newColumns;
   }
 }
