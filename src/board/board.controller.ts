@@ -25,7 +25,6 @@ export class BoardController {
     try {
       await validate(createBoardDto);
 
-      // createBoardDto.member.push(user.id);
       return await this.boardService.createBoard(createBoardDto);
     } catch (error) {
       return { message: `${error}` };
