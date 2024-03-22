@@ -9,6 +9,7 @@ import { UpdateCardDto } from './dto/update-card.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
+import { LexoRank } from 'lexorank';
 
 @Injectable()
 export class CardService {
@@ -18,6 +19,9 @@ export class CardService {
     private readonly usersService: UserService,
   ) {}
 
+<<<<<<< HEAD
+  async create(createCardDto: CreateCardDto, columnId: number) {
+=======
   // 마감일이 시작일 이전인지 또는 마감일이 오늘 이전인지 확인(지정된 경우).
   async create(createCardDto: CreateCardDto, userId: number, columnId: number) {
     if (
@@ -30,6 +34,7 @@ export class CardService {
         '마감일은 시작일 이후이거나 오늘 이후여야 합니다.',
       );
     }
+>>>>>>> 5446cf467444166ce9f525a17d7a1ef4a1d66b7e
     const findCards = await this.cardRepository.find({
       where: {
         column: {
@@ -141,5 +146,26 @@ export class CardService {
         order: 'ASC',
       },
     });
+
+    const findIdx = findAllCard.findIndex((card) => {
+      return card.order === rankId;
+    });
+
+    let moveLexoRank: LexoRank;
+
+    if (findIdx === 0) {
+      moveLexoRank = LexoRank.parse(findAllCard[findIdx].order).genPrev();
+    } else if (findIdx === findAllCard.length - 1) {
+      moveLexoRank = LexoRank.parse(findAllCard[findIdx].order).genNext();
+    } else {
+      moveLexoRank = LexoRank.parse(findAllCard[findIdx].order).between(
+        LexoRank.parse(findAllCard[findIdx - 1].order),
+      );
+    }
+
+    await this.cardRepository.update(
+      { id: cardId },
+      { order: moveLexoRank.toString() },
+    );
   }
 }
