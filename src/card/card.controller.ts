@@ -17,6 +17,7 @@ import { UpdateCardDto } from './dto/update-card.dto';
 import { AuthGuard } from '@nestjs/passport';
 
 // ⭐️⭐️⭐️ 우선 User 관련된 정보는 barer 토큰으로부터 받아오기 때문에, userId를 받아오거나 하는 것들은 req에서 받아오지 않도록 해야 한다. ⭐️⭐️⭐️
+// 
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('card')

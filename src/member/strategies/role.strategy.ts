@@ -22,10 +22,11 @@ export class RoleStrategy {
         userId,
       },
     });
+    console.log(member)
     if (!member) {
       throw new ForbiddenException('권한이 없습니다.');
     }
     const userRole: Role = member.role;
     return requiredRole.includes(userRole); // 1 === Admin_or_Super
   }
-}
+} // 초대가 되었는지 검증하고 + 권한이 뭔지 까지 검증하는
