@@ -72,7 +72,6 @@ export class ColumnService {
 
       const reorderColumns = await this.deleteReorder(columns, column.order);
 
-      console.log('--------', reorderColumns);
       await queryRunner.manager.delete(Columns, column);
       await queryRunner.manager.save(Columns, reorderColumns);
 
@@ -128,18 +127,15 @@ export class ColumnService {
         } else if (column.order === order) {
           return { ...column, order: reorder };
         }
-        return null;
       } else {
         if (column.order > order && column.order <= reorder) {
           return { ...column, order: column.order - 1 };
         } else if (column.order === order) {
           return { ...column, order: reorder };
         }
-        return null;
       }
     });
-
-    const newColumns = reorderColumns.filter((column) => column !== null);
+    const newColumns = reorderColumns.filter((column) => column !== undefined);
 
     return newColumns;
   }

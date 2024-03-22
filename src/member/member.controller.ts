@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Request,
+  HttpStatus,
+} from '@nestjs/common';
 import { MemberService } from './member.service';
 import { EmailMemberDto } from './dto/emailMember.dto';
 import { Role } from './types/role.type';
@@ -9,7 +20,7 @@ import { PatchRoleDto } from './dto/updateRole.dto';
 
 @UseGuards(JwtAuthGuard)
 @UseGuards(RoleGuard)
-@Controller('/:boardId')// 뭘로 할지 회의 필요
+@Controller('/:boardId') // 뭘로 할지 회의 필요
 export class MemberController {
   constructor(private readonly memberService: MemberService) {}
 
@@ -18,29 +29,33 @@ export class MemberController {
   //멤버 초대
   @Roles(Role.ADMIN, Role.SUPER)
   @Post('/invite')
-  async invite(@Request() req, @Param('boardId') boardId: number, @Body() emailMemberDto:EmailMemberDto) {
-    const userId = req.user.id; 
+  async invite(
+    @Request() req,
+    @Param('boardId') boardId: number,
+    @Body() emailMemberDto: EmailMemberDto,
+  ) {
+    const userId = req.user.id;
     await this.memberService.invite(userId, boardId, emailMemberDto);
     return {
       statusCode: HttpStatus.CREATED,
       message: '초대에 성공했습니다.',
-    }
+    };
   }
 
   //접근 가능한 보드 조회 ..
   @Get('/activate')
   async boardCanAccess(@Request() req) {
-    const userId = req.user.id; 
+    const userId = req.user.id;
     const data = await this.memberService.boardCanAccess(userId);
     return {
       statusCode: HttpStatus.OK,
       message: '조회에 성공했습니다.',
       data,
-    }
+    };
   }
 
   // 보드 안에 있는 멤버 조회
-  @Roles(Role.USER ,Role.ADMIN, Role.SUPER)
+  @Roles(Role.USER, Role.ADMIN, Role.SUPER)
   @Get('/allmembers')
   async accessMembers(@Param('boardId') boardId: number) {
     const data = await this.memberService.accessMembers(boardId);
@@ -48,41 +63,49 @@ export class MemberController {
       statusCode: HttpStatus.OK,
       message: '조회에 성공했습니다.',
       data,
-    }
+    };
   }
 
   // 권한 +-인가
   @Roles(Role.SUPER)
   @Patch('/managerole')
-  async patchMemberRole(@Request() req, @Param('boardId') boardId: number, patchRoleDto:PatchRoleDto) {
+  async patchMemberRole(
+    @Request() req,
+    @Param('boardId') boardId: number,
+    patchRoleDto: PatchRoleDto,
+  ) {
     await this.memberService.patchMemberRole(boardId, patchRoleDto);
     return {
       statusCode: HttpStatus.OK,
       message: '권한 변경에 성공했습니다.',
-    }
+    };
   }
 
   //보드 탈퇴.
-  @Roles(Role.USER ,Role.ADMIN, Role.SUPER)
+  @Roles(Role.USER, Role.ADMIN, Role.SUPER)
   @Delete('/leave')
   async boardLeave(@Request() req, @Param('boardId') boardId: number) {
-    const userId = req.user.id; 
+    const userId = req.user.id;
     await this.memberService.boardLeave(userId, boardId);
     return {
       statusCode: HttpStatus.OK,
       message: '보드 탈퇴가 완료되었습니다.',
-    }
+    };
   }
 
   //멤버 강퇴
   @Roles(Role.ADMIN, Role.SUPER)
   @Delete('/kick')
-  async boardKick(@Request() req, @Param('boardId') boardId: number, emailMemberDto:EmailMemberDto) {
-    const userId = req.user.id; 
-    await this.memberService.boardKick(userId, boardId ,emailMemberDto);
+  async boardKick(
+    @Request() req,
+    @Param('boardId') boardId: number,
+    emailMemberDto: EmailMemberDto,
+  ) {
+    const userId = req.user.id;
+    await this.memberService.boardKick(userId, boardId, emailMemberDto);
     return {
       statusCode: HttpStatus.OK,
       message: '강제 퇴장이 완료되었습니다.',
-    }
+    };
   }
 }

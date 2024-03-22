@@ -47,19 +47,6 @@ export class UserController {
     };
   }
 
-<<<<<<< HEAD
-    @UseGuards(JwtAuthGuard)
-    @Get('/user')
-    async getUser(@Request() req){
-        const userId = req.user.id; //
-        const data = await this.userService.getUser(userId);
-        return {
-            statusCode: HttpStatus.OK,
-            message: '정보 조회에 성공했습니다.',
-            data,
-        }
-    }
-=======
   @UseGuards(JwtAuthGuard)
   @Get('/user')
   async getUser(@Request() req) {
@@ -71,7 +58,6 @@ export class UserController {
       data,
     };
   }
->>>>>>> 29da980e63770153d00690220cc5135d5426af4a
 
   @UseGuards(JwtAuthGuard)
   @Patch('/user')
