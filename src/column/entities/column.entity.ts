@@ -26,10 +26,10 @@ export class Columns {
   @IsNotEmpty({ message: '제목을 입력해주세요.' })
   title: string;
 
-  @OneToMany(() => Card, (card) => card.column)
+  @OneToMany(() => Card, (card) => card.column, { cascade: true })
   cards: Card[];
 
-  @ManyToOne(() => Board, (board) => board.columns)
+  @ManyToOne(() => Board, (board) => board.columns, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'boardId', referencedColumnName: 'id' })
   board: Board;
 }

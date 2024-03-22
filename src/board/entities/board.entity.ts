@@ -42,7 +42,7 @@ export class Board {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Columns, (column) => column.board)
+  @OneToMany(() => Columns, (column) => column.board, { cascade: true })
   columns: Columns[];
 
   @OneToMany(() => Member, (member) => member.board, { cascade: true })
