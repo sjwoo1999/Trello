@@ -26,10 +26,10 @@ export class BoardService {
 
   async createBoard(createBoardDto: CreateBoardDto, userId: number) {
     const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
     try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
       const board = await queryRunner.manager.save(Board, createBoardDto);
 
       await queryRunner.manager.save(Member, {
