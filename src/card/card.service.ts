@@ -9,6 +9,7 @@ import { UpdateCardDto } from './dto/update-card.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
+import { LexoRank } from 'lexorank';
 
 @Injectable()
 export class CardService {
@@ -18,7 +19,7 @@ export class CardService {
     private readonly usersService: UserService,
   ) {}
 
-  async create(createCardDto: CreateCardDto, userId: number, columnId: number) {
+  async create(createCardDto: CreateCardDto, columnId: number) {
     const findCards = await this.cardRepository.find({
       where: {
         column: {
@@ -130,5 +131,26 @@ export class CardService {
         order: 'ASC',
       },
     });
+
+    const findIdx = findAllCard.findIndex((card) => {
+      return card.order === rankId;
+    });
+
+    let moveLexoRank: LexoRank;
+
+    if (findIdx === 0) {
+      moveLexoRank = LexoRank.parse(findAllCard[findIdx].order).genPrev();
+    } else if (findIdx === findAllCard.length - 1) {
+      moveLexoRank = LexoRank.parse(findAllCard[findIdx].order).genNext();
+    } else {
+      moveLexoRank = LexoRank.parse(findAllCard[findIdx].order).between(
+        LexoRank.parse(findAllCard[findIdx - 1].order),
+      );
+    }
+
+    await this.cardRepository.update(
+      { id: cardId },
+      { order: moveLexoRank.toString() },
+    );
   }
 }

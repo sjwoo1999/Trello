@@ -32,7 +32,7 @@ export class Card {
 
   @IsNumber()
   @Column({ type: 'int', nullable: false })
-  order: number;
+  order: string;
 
   @IsNumber()
   @Column({ type: 'int' })
