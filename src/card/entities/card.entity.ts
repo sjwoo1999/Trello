@@ -72,14 +72,14 @@ export class Card {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Comment, (comment) => comment.card)
+  @OneToMany(() => Comment, (comment) => comment.card, { cascade: true })
   comments: Comment[];
 
-  @ManyToOne(() => User, (user) => user.cards)
+  @ManyToOne(() => User, (user) => user.cards, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
   user: User;
 
-  @ManyToOne(() => Columns, (column) => column.cards)
+  @ManyToOne(() => Columns, (column) => column.cards, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'columnId', referencedColumnName: 'id' })
   column: Columns;
 }

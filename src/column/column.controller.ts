@@ -85,7 +85,7 @@ export class ColumnController {
   @Put('/:columnId')
   async changeOrderColumn(
     @Param() params: { boardId: number; columnId: number },
-    @Body() order: number,
+    @Body('order') order: number,
   ) {
     await this.boardService.findBoardById(params.boardId);
 

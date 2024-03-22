@@ -39,7 +39,7 @@ export class Comment {
   @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
   user: User;
 
-  @ManyToOne(() => Card, (card) => card.comments)
+  @ManyToOne(() => Card, (card) => card.comments, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'cardId', referencedColumnName: 'id' })
   card: Card;
 }

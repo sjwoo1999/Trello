@@ -1,5 +1,5 @@
 // auth.strategy.ts
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Role } from '../types/role.type';
 import { Member } from '../entities/member.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,7 +14,7 @@ export class RoleStrategy {
   async validate(
     userId: number,
     boardId: number,
-    requiredRole: Role,
+    requiredRole: Role[],
   ): Promise<boolean> {
     const member = await this.memberRepository.findOne({
       where: {
@@ -22,7 +22,10 @@ export class RoleStrategy {
         userId,
       },
     });
+    if (!member) {
+      throw new ForbiddenException('권한이 없습니다.');
+    }
     const userRole: Role = member.role;
-    return userRole === requiredRole;
+    return requiredRole.includes(userRole); // 1 === Admin_or_Super
   }
 }
