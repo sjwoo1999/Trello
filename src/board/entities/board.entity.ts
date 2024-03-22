@@ -36,9 +36,6 @@ export class Board {
   @IsNotEmpty({ message: '공개 범위를 선택해주세요.' })
   visibility: Visibility;
 
-  @Column({ type: 'json', nullable: false })
-  member: number[];
-
   @CreateDateColumn()
   createdAt: Date;
 

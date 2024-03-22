@@ -11,7 +11,7 @@ import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { JwtAuthGuard } from './jwt.guard';
 import { Role } from '../types/user.type';
-import { ROLES_KEY } from '../decorators/role.decorator';
+import { ROLES_KEY } from '../../member/decorators/role.decorator';
 
 @Injectable()
 export class RolesGuard extends JwtAuthGuard implements CanActivate {
