@@ -56,19 +56,3 @@ export class CommentController {
     return this.commentService.delete(+commentId, userId);
   }
 }
-
-// function UserDetails(): (
-//   target: CommentController,
-//   propertyKey: 'createComment',
-//   parameterIndex: 2,
-// ) => void {
-//   throw new Error('Function not implemented.');
-// }
-
-// function User(): (
-//   target: CommentController,
-//   propertyKey: 'createComment',
-//   parameterIndex: 2,
-// ) => void {
-//   throw new Error('Function not implemented.');
-// }
