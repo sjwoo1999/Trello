@@ -10,11 +10,7 @@ import {
 import { Color } from '../types/color.type';
 import { Visibility } from '../types/visibility.type';
 import { Columns } from 'src/column/entities/column.entity';
-<<<<<<< HEAD
-import { array } from 'joi';
 import { Member } from 'src/member/entities/member.entity';
-=======
->>>>>>> 12c15e2321babe86b3aadb1ccbdd448df978fff0
 
 @Entity({ name: 'boards' })
 export class Board {
@@ -40,12 +36,9 @@ export class Board {
   @IsNotEmpty({ message: '공개 범위를 선택해주세요.' })
   visibility: Visibility;
 
-<<<<<<< HEAD
-=======
   @Column({ type: 'json', nullable: false })
   member: number[];
 
->>>>>>> 12c15e2321babe86b3aadb1ccbdd448df978fff0
   @CreateDateColumn()
   createdAt: Date;
 
@@ -55,6 +48,6 @@ export class Board {
   @OneToMany(() => Columns, (column) => column.board)
   columns: Columns[];
 
-  @OneToMany(() => Member, (member) => member.board, {cascade: true})
+  @OneToMany(() => Member, (member) => member.board, { cascade: true })
   members: Member[];
 }

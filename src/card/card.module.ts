@@ -6,9 +6,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ColumnModule } from 'src/column/column.module';
 import { UserModule } from 'src/user/user.module';
 //
-import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtStrategy } from 'src/user/strategies/jwt.strategy';
+//import { JwtModule } from '@nestjs/jwt';
+//import { ConfigModule, ConfigService } from '@nestjs/config';
+//import { JwtStrategy } from 'src/user/strategies/jwt.strategy';
 
 // import { AuthModule } from 'src/auth/auth.module"; -> 일단 제외하고
 
