@@ -42,11 +42,8 @@
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.4.5",
     "joi": "^17.12.2",
-<<<<<<< HEAD
     "jsonwebtoken": "^9.0.2",
-=======
     "lexorank": "^1.0.5",
->>>>>>> 1ce6a14160479e983d5b8c077854626961db292d
     "lodash": "^4.17.21",
     "minimatch": "^9.0.3",
     "multer": "^1.4.5-lts.1",

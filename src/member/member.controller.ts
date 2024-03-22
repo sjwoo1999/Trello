@@ -41,18 +41,6 @@ export class MemberController {
     };
   }
 
-  //접근 가능한 보드 조회 ..
-  @Get('/activate')
-  async boardCanAccess(@Request() req) {
-    const userId = req.user.id;
-    const data = await this.memberService.boardCanAccess(userId);
-    return {
-      statusCode: HttpStatus.OK,
-      message: '조회에 성공했습니다.',
-      data,
-    };
-  }
-
   // 보드 안에 있는 멤버 조회
   @Roles(Role.USER, Role.ADMIN, Role.SUPER)
   @Get('/:boardId/allmembers')
