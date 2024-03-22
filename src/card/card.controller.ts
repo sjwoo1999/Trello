@@ -12,7 +12,7 @@ import {
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
-/////
+
 // import
 
 @Controller('card')
@@ -32,9 +32,18 @@ export class CardController {
     return this.cardService.create(createCardDto, userId, columnId);
   }
 
+  // addUser
+  @Post('/:cardId/members')
+  async addMemberToCard(@Param('cardId') cardId: number, @Req() req: Request) {
+    console.log(cardId);
+
+    // 현재 로그인한 회원이 현재 워크스페이스에 해당하는지 확인해야 하고
+
+    return this.cardService.addMemberToCard(+cardId, req['userId']);
+  }
+
   @Get('/:columnId')
   async findAll(@Param('columnId', ParseIntPipe) columnId: number) {
-    // service에서 findAll 함수의 매개변수를 수정해줄 필요가 있다.
     return this.cardService.findAll(columnId);
   }
 
@@ -62,7 +71,6 @@ export class CardController {
     @Param('cardId', ParseIntPipe) cardId: number,
     @Body('rankId') rankId: string,
   ) {
-    // service에서 updateCardOrder 함수를 생성해주고 처리해주어야 한다.
     return await this.cardService.updateCardOrder(columnId, cardId, rankId);
   }
 }
