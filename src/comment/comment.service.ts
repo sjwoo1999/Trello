@@ -27,39 +27,36 @@ export class CommentService {
   async create(
     createCommentDto: CreateCommentDto,
     userId: number,
+    cardId: number,
   ): Promise<string> {
     //cardId로 bordId 찾기
-    const card = await this.cardRepository.findOne({
-      where: { id: createCommentDto.cardId },
-    });
-    const column = await this.columnRepository.findOne({
-      where: { id: card.columnId },
-    });
-    console.log(card);
+    // const card = await this.cardRepository.findOne({
+    //   where: { id: cardId },
+    // });
+    // const column = await this.columnRepository.findOne({
+    //   where: { id: card.columnId },
+    // });
+    // console.log(card);
     // 보드에 초대된 멤버인지 확인
-    if (this.isMemberOfBoard(userId, column.boardId)) {
-      // 보드에 초대된 멤버인 경우에만 댓글 작성
-      const newComment = {
-        content: createCommentDto.content,
-        user: { id: userId },
-        cardId: createCommentDto.cardId,
-      };
-      console.log(newComment);
-      await this.commentRepository.save(newComment);
-      return '댓글이 성공적으로 작성되었습니다.';
-    } else {
-      throw new Error('보드에 초대되지 않은 멤버는 댓글을 작성할 수 없습니다.');
-    }
+    // 보드에 초대된 멤버인 경우에만 댓글 작성
+    const newComment = {
+      content: createCommentDto.content,
+      userId: userId,
+      cardId: cardId,
+    };
+    console.log(newComment);
+    await this.commentRepository.save(newComment);
+    return '댓글이 성공적으로 작성되었습니다.';
   }
 
-  // 보드에 초대된 멤버인지 확인하는 메서드
-  async isMemberOfBoard(userId: number, boardId: number): Promise<boolean> {
-    const member = await this.memberRepository.findOne({
-      where: { userId, boardId },
-    });
-    if (member) return true;
-    return false;
-  }
+  // // 보드에 초대된 멤버인지 확인하는 메서드
+  // async isMemberOfBoard(userId: number, boardId: number): Promise<boolean> {
+  //   const member = await this.memberRepository.findOne({
+  //     where: { userId, boardId },
+  //   });
+  //   if (member) return true;
+  //   return false;
+  // }
 
   // 댓글 조회 메서드
   async findAll(cardId: number): Promise<Comment[]> {
