@@ -16,7 +16,7 @@ export class MemberService {
   async invite(userId: number, boardId: number, {email}:EmailMemberDto) {
     const user = this.isSignUp(email);
     if (!user){
-      //노드메일러
+      throw new BadRequestException('사용자가 존재하지 않습니다.')
     }
     const member = await this.isJoinBoard((await user).id, boardId)
     if (member){

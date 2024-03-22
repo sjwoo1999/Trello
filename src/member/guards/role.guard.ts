@@ -13,10 +13,12 @@ export class RoleGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const requiredRole = this.reflector.get<Role[]>(ROLES_KEY, context.getHandler());
+    console.log(requiredRole);
     if (!requiredRole) {
       return true; // @Roles 데코레이터가 없는 경우에는 모든 사용자가 접근 가능
     }
     const request = context.switchToHttp().getRequest();
+    console.log(request);
     const userId = request.user.id;
     const boardId = request.body.boardId;
     return await this.strategy.validate(userId, boardId, requiredRole);
