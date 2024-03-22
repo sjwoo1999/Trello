@@ -20,7 +20,7 @@ export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
   // 댓글 작성 API 경로
-  @Post('cards/:cardId/comment')
+  @Post('card/:cardId/comment')
   async createComment(
     @Param('cardId') cardId: string,
     @Body() createCommentDto: CreateCommentDto,
@@ -50,7 +50,7 @@ export class CommentController {
     return this.commentService.findOne(+commentId);
   }
 
-  @Delete('commentId')
+  @Delete(':commentId')
   remove(@Param('commentId') commentId: string, @Req() req: any) {
     const userId = req.user;
     return this.commentService.delete(+commentId, userId);
