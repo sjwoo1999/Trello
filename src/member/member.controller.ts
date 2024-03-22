@@ -18,14 +18,13 @@ import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 import { Roles } from './decorators/role.decorator';
 import { PatchRoleDto } from './dto/updateRole.dto';
 
-@UseGuards(JwtAuthGuard)
-@UseGuards(RoleGuard)
+@UseGuards(JwtAuthGuard, RoleGuard)
 @Controller('member') // 뭘로 할지 회의 필요
 export class MemberController {
   constructor(private readonly memberService: MemberService) {}
 
   //board 생성하면 동시에 멤버 생성도 해주셔야될거같아서 생성한사람은 role === super 해주시면
-
+  // /host3000/:boardId/invite
   //멤버 초대
   @Roles(Role.ADMIN, Role.SUPER)
   @Post('/:boardId/invite')
@@ -72,7 +71,7 @@ export class MemberController {
   async patchMemberRole(
     @Request() req,
     @Param('boardId') boardId: number,
-    patchRoleDto: PatchRoleDto,
+    @Body() patchRoleDto: PatchRoleDto,
   ) {
     await this.memberService.patchMemberRole(boardId, patchRoleDto);
     return {
@@ -99,8 +98,9 @@ export class MemberController {
   async boardKick(
     @Request() req,
     @Param('boardId') boardId: number,
-    emailMemberDto: EmailMemberDto,
+    @Body() emailMemberDto: EmailMemberDto,
   ) {
+    console.log(emailMemberDto);
     const userId = req.user.id;
     await this.memberService.boardKick(userId, boardId, emailMemberDto);
     return {
