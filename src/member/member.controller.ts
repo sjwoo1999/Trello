@@ -19,7 +19,7 @@ import { Roles } from './decorators/role.decorator';
 import { PatchRoleDto } from './dto/updateRole.dto';
 
 @UseGuards(JwtAuthGuard, RoleGuard)
-@Controller('member') // 뭘로 할지 회의 필요
+@Controller('/:boardId') // 뭘로 할지 회의 필요
 export class MemberController {
   constructor(private readonly memberService: MemberService) {}
 
@@ -27,7 +27,7 @@ export class MemberController {
   // /host3000/:boardId/invite
   //멤버 초대
   @Roles(Role.ADMIN, Role.SUPER)
-  @Post('/:boardId/invite')
+  @Post('/invite')
   async invite(
     @Request() req,
     @Param('boardId') boardId: number,
@@ -43,7 +43,7 @@ export class MemberController {
 
   // 보드 안에 있는 멤버 조회
   @Roles(Role.USER, Role.ADMIN, Role.SUPER)
-  @Get('/:boardId/allmembers')
+  @Get('/allmembers')
   async accessMembers(@Param('boardId') boardId: number) {
     const data = await this.memberService.accessMembers(boardId);
     return {
@@ -55,7 +55,7 @@ export class MemberController {
 
   // 권한 +-인가
   @Roles(Role.SUPER)
-  @Patch('/:boardId/managerole')
+  @Patch('/managerole')
   async patchMemberRole(
     @Request() req,
     @Param('boardId') boardId: number,
@@ -70,7 +70,7 @@ export class MemberController {
 
   //보드 탈퇴.
   @Roles(Role.USER, Role.ADMIN, Role.SUPER)
-  @Delete('/:boardId/leave')
+  @Delete('/leave')
   async boardLeave(@Request() req, @Param('boardId') boardId: number) {
     const userId = req.user.id;
     await this.memberService.boardLeave(userId, boardId);
@@ -82,7 +82,7 @@ export class MemberController {
 
   //멤버 강퇴
   @Roles(Role.ADMIN, Role.SUPER)
-  @Delete('/:boardId/kick')
+  @Delete('/kick')
   async boardKick(
     @Request() req,
     @Param('boardId') boardId: number,
