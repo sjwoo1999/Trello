@@ -6,39 +6,43 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { BoardIdMemberDto } from '../member/dto/boardId-member.dto';
+import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('comment')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
   // 댓글 작성 API 경로
   @Post('cards/:cardId/comment')
-  createComment(
+  async createComment(
     @Param('cardId') cardId: string,
     @Body() createCommentDto: CreateCommentDto,
-    @Body() member: BoardIdMemberDto,
-  ): string {
-    return this.commentService.create(createCommentDto, member); // 카드 ID와 멤버 권한을 검사하여 댓글 생성
+    @Req() req: any,
+  ): Promise<string> {
+    const userId = req.user;
+    return this.commentService.create(createCommentDto, userId); // 카드 ID와 멤버 권한을 검사하여 댓글 생성
   }
 
-  @Patch('card/:cardId/comment/:commentId')
+  @Patch(':commentId')
   update(
-    @Param('cardId') cardId: string,
     @Param('commentId') commentId: string,
     @Body() updateCommentDto: UpdateCommentDto,
-    @Body() member: BoardIdMemberDto,
+    @Req() req: any,
   ) {
-    return this.commentService.update(+commentId, updateCommentDto);
+    const userId = req.user;
+    return this.commentService.update(+commentId, updateCommentDto, userId);
   }
 
-  @Get('')
-  findAll() {
-    return this.commentService.findAll();
+  @Get('cards/:cardId/comment')
+  findAll(@Param('cardId') cardId: string) {
+    return this.commentService.findAll(+cardId);
   }
 
   @Get(':commentId')
@@ -46,12 +50,10 @@ export class CommentController {
     return this.commentService.findOne(+commentId);
   }
 
-  @Delete('card/:cardId/comment/:commentId')
-  remove(
-    @Param('commentId') commentId: string,
-    @Body() member: BoardIdMemberDto,
-  ) {
-    return this.commentService.delete(+commentId);
+  @Delete('commentId')
+  remove(@Param('commentId') commentId: string, @Req() req: any) {
+    const userId = req.user;
+    return this.commentService.delete(+commentId, userId);
   }
 }
 
