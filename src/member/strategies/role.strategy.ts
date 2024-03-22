@@ -22,6 +22,7 @@ export class RoleStrategy {
         userId,
       },
     });
+    console.log(member)
     if (!member) {
       throw new ForbiddenException('권한이 없습니다.');
     }
