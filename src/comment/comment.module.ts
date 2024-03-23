@@ -10,7 +10,8 @@ import { RoleStrategy } from 'src/member/strategies/role.strategy';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Comment, Member, Card, Columns])],
-  controllers: [CommentController, RoleStrategy],
-  providers: [CommentService],
+  controllers: [CommentController],
+  providers: [CommentService, RoleStrategy],
+  exports: [TypeOrmModule],
 })
 export class CommentModule {}

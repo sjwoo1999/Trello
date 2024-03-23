@@ -16,6 +16,10 @@ import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 import { RoleGuard } from 'src/member/guards/role.guard';
 import { Roles } from 'src/member/decorators/role.decorator';
 import { Role } from 'src/member/types/role.type';
+// 추가 시작
+import { BoardService } from 'src/board/board.service';
+import { ColumnService } from 'src/column/column.service';
+// 추가 끝
 
 @UseGuards(JwtAuthGuard, RoleGuard)
 @Controller('comment')
@@ -27,6 +31,9 @@ export class CommentController {
   @Post('card/:cardId/comment')
   async createComment(
     @Param('cardId') cardId: number,
+    // 추가 시작
+    @Param('boardId') boardId: number,
+    // 추가 끝
     @Body() createCommentDto: CreateCommentDto,
     @Req() req: any,
   ): Promise<string> {
@@ -37,6 +44,9 @@ export class CommentController {
   @Patch(':commentId')
   update(
     @Param('commentId') commentId: number,
+    // 추가 시작
+    @Param('boardId') boardId: number,
+    // 추가 끝
     @Body() updateCommentDto: UpdateCommentDto,
     @Req() req: any,
   ) {
@@ -45,17 +55,36 @@ export class CommentController {
   }
 
   @Get('cards/:cardId/comment')
-  findAll(@Param('cardId') cardId: number) {
+  findAll(
+    @Param('cardId')
+    cardId: number,
+    // 추가 시작
+    @Param('boardId')
+    boardId: number,
+    // 추가 끝
+  ) {
     return this.commentService.findAll(+cardId);
   }
 
   @Get(':commentId')
-  findOne(@Param('commentId') commentId: number) {
+  findOne(
+    @Param('commentId') commentId: number,
+    // 추가 시작
+    @Param('boardId')
+    boardId: number,
+    // 추가 끝
+  ) {
     return this.commentService.findOne(+commentId);
   }
 
   @Delete(':commentId')
-  remove(@Param('commentId') commentId: number, @Req() req: any) {
+  remove(
+    @Param('commentId') commentId: number,
+    // 추가 시작
+    @Param('boardId') boardId: number,
+    // 추가 끝
+    @Req() req: any,
+  ) {
     const userId = req.user.id;
     return this.commentService.delete(+commentId, userId);
   }

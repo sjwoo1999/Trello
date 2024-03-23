@@ -45,6 +45,7 @@ export class CardController {
     // @Param('columnId', ParseIntPipe) columnId: number,
   ) {
     // req에서 userId를 받아주는 형태 : Bearer Token을 사용한다면 req에서 userId에서 userId를 가져올 필요가 없다.
+    // 근데 지금은 req로 userId와 columnId를 받아왔다?
     const userId = req['userId'];
     const columnId = req['columnId'];
 
