@@ -18,17 +18,16 @@ import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 import { Roles } from './decorators/role.decorator';
 import { PatchRoleDto } from './dto/updateRole.dto';
 
-@UseGuards(JwtAuthGuard)
-@UseGuards(RoleGuard)
-@Controller('member') // 뭘로 할지 회의 필요
+@UseGuards(JwtAuthGuard, RoleGuard)
+@Controller('/:boardId') // 뭘로 할지 회의 필요
 export class MemberController {
   constructor(private readonly memberService: MemberService) {}
 
   //board 생성하면 동시에 멤버 생성도 해주셔야될거같아서 생성한사람은 role === super 해주시면
-
+  // /host3000/:boardId/invite
   //멤버 초대
   @Roles(Role.ADMIN, Role.SUPER)
-  @Post('/:boardId/invite')
+  @Post('/invite')
   async invite(
     @Request() req,
     @Param('boardId') boardId: number,
@@ -42,21 +41,9 @@ export class MemberController {
     };
   }
 
-  //접근 가능한 보드 조회 ..
-  @Get('/activate')
-  async boardCanAccess(@Request() req) {
-    const userId = req.user.id;
-    const data = await this.memberService.boardCanAccess(userId);
-    return {
-      statusCode: HttpStatus.OK,
-      message: '조회에 성공했습니다.',
-      data,
-    };
-  }
-
   // 보드 안에 있는 멤버 조회
   @Roles(Role.USER, Role.ADMIN, Role.SUPER)
-  @Get('/:boardId/allmembers')
+  @Get('/allmembers')
   async accessMembers(@Param('boardId') boardId: number) {
     const data = await this.memberService.accessMembers(boardId);
     return {
@@ -68,11 +55,11 @@ export class MemberController {
 
   // 권한 +-인가
   @Roles(Role.SUPER)
-  @Patch('/:boardId/managerole')
+  @Patch('/managerole')
   async patchMemberRole(
     @Request() req,
     @Param('boardId') boardId: number,
-    patchRoleDto: PatchRoleDto,
+    @Body() patchRoleDto: PatchRoleDto,
   ) {
     await this.memberService.patchMemberRole(boardId, patchRoleDto);
     return {
@@ -83,7 +70,7 @@ export class MemberController {
 
   //보드 탈퇴.
   @Roles(Role.USER, Role.ADMIN, Role.SUPER)
-  @Delete('/:boardId/leave')
+  @Delete('/leave')
   async boardLeave(@Request() req, @Param('boardId') boardId: number) {
     const userId = req.user.id;
     await this.memberService.boardLeave(userId, boardId);
@@ -95,12 +82,13 @@ export class MemberController {
 
   //멤버 강퇴
   @Roles(Role.ADMIN, Role.SUPER)
-  @Delete('/:boardId/kick')
+  @Delete('/kick')
   async boardKick(
     @Request() req,
     @Param('boardId') boardId: number,
-    emailMemberDto: EmailMemberDto,
+    @Body() emailMemberDto: EmailMemberDto,
   ) {
+    console.log(emailMemberDto);
     const userId = req.user.id;
     await this.memberService.boardKick(userId, boardId, emailMemberDto);
     return {

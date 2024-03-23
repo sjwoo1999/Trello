@@ -11,6 +11,7 @@ import { Not, Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
 import { LexoRank } from 'lexorank';
 
+
 @Injectable()
 export class CardService {
   constructor(
@@ -19,7 +20,22 @@ export class CardService {
     private readonly usersService: UserService,
   ) {}
 
+<<<<<<< HEAD
   async create(createCardDto: CreateCardDto, columnId: number) {
+=======
+  // 마감일이 시작일 이전인지 또는 마감일이 오늘 이전인지 확인(지정된 경우).
+  async create(createCardDto: CreateCardDto, userId: number, columnId: number) {
+    if (
+      createCardDto.startDate &&
+      createCardDto.endDate &&
+      (createCardDto.endDate < createCardDto.startDate ||
+        createCardDto.endDate < new Date())
+    ) {
+      throw new BadRequestException(
+        '마감일은 시작일 이후이거나 오늘 이후여야 합니다.',
+      );
+    }
+>>>>>>> 24f06845f9d09405327054b0b1227872c7232005
     const findCards = await this.cardRepository.find({
       where: {
         column: {
