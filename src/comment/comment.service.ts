@@ -35,7 +35,7 @@ export class CommentService {
     const column = await this.columnRepository.findOne({
       where: { id: card.columnId },
     });
-    console.log(card);
+    (card);
     // 보드에 초대된 멤버인지 확인
     if (this.isMemberOfBoard(userId, column.boardId)) {
       // 보드에 초대된 멤버인 경우에만 댓글 작성
@@ -44,7 +44,7 @@ export class CommentService {
         user: { id: userId },
         cardId: createCommentDto.cardId,
       };
-      console.log(newComment);
+      (newComment);
       await this.commentRepository.save(newComment);
       return '댓글이 성공적으로 작성되었습니다.';
     } else {
