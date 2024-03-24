@@ -99,8 +99,8 @@ export class ColumnService {
     await queryRunner.startTransaction();
 
     try {
-      const columns = await this.findAllColumns(boardId);
-      const column = await this.findColumnById(columnId);
+      const columns = await this.findAllColumns(boardId); // 해당 보드의 전체 컬럼 조회
+      const column = await this.findColumnById(columnId); // 바꿀 컬럼 조회
 
       const reorderColumns = await this.reorder(columns, column.order, order);
 

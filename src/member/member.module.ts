@@ -6,11 +6,12 @@ import { Member } from './entities/member.entity';
 import { PassportModule } from '@nestjs/passport';
 import { User } from 'src/user/entities/user.entity';
 import { RoleStrategy } from './strategies/role.strategy';
+import { RoleGuard } from './guards/role.guard';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Member, User]), PassportModule],
   controllers: [MemberController],
-  providers: [MemberService, RoleStrategy],
-  exports: [TypeOrmModule],
+  providers: [MemberService, RoleStrategy, RoleGuard],
+  exports: [TypeOrmModule, RoleGuard, MemberService],
 })
 export class MemberModule {}

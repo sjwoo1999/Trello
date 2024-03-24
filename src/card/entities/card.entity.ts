@@ -32,7 +32,11 @@ export class Card {
   @Column({ type: 'int', nullable: false })
   order: number;
 
+<<<<<<< HEAD
   @Column({ type: 'int', nullable: false })
+=======
+  @Column({ type: 'int' })
+>>>>>>> f2c38f29e167720291ecd999f0316c2a48dcdddc
   userId: number;
 
   @IsString()
