@@ -40,13 +40,13 @@ export class CardController {
   @Post('/:columnId')
   async create(
     @Body() createCardDto: CreateCardDto,
-    @Req() req: Request,
+    @Req() req: any,
     // @Param('userId', ParseIntPipe) userId: number,
     // @Param('columnId', ParseIntPipe) columnId: number,
   ) {
     // req에서 userId를 받아주는 형태 : Bearer Token을 사용한다면 req에서 userId에서 userId를 가져올 필요가 없다.
     // 근데 지금은 req로 userId와 columnId를 받아왔다?
-    const userId = req['userId'];
+    const userId = req.user.id;
     const columnId = req['columnId'];
 
     // service에서 create 함수의 매개변수를 수정해줄 필요가 있다.
@@ -63,7 +63,7 @@ export class CardController {
 
   // addUser
   @Post('/:cardId/members')
-  async addMemberToCard(@Param('cardId') cardId: number, @Req() req: Request) {
+  async addMemberToCard(@Param('cardId') cardId: number, @Req() req: any) {
     console.log(cardId);
 
     // 현재 로그인한 회원이 현재 워크스페이스에 해당하는지 확인해야 하고
