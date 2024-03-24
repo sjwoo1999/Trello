@@ -26,15 +26,12 @@ export class Card {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @IsNumber()
   @Column({ type: 'int', nullable: false })
   columnId: number;
 
-  @IsNumber()
   @Column({ type: 'int', nullable: false })
   order: number;
 
-  @IsNumber()
   @Column({ type: 'int' })
   userId: number;
 

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Card } from './entities/card.entity';
 import { CreateCardDto } from './dto/create-card.dto';
@@ -20,7 +21,7 @@ export class CardService {
   ) {}
 
   // 마감일이 시작일 이전인지 또는 마감일이 오늘 이전인지 확인(지정된 경우).
-  async create(createCardDto: CreateCardDto, userId: number, columnId: number) {
+  async create(createCardDto: CreateCardDto) {
     if (
       createCardDto.startDate &&
       createCardDto.endDate &&
@@ -31,35 +32,20 @@ export class CardService {
         '마감일은 시작일 이후이거나 오늘 이후여야 합니다.',
       );
     }
-    const findCards = await this.cardRepository.find({
-      // request에서 받은 값을 집어넣어야 한다.
 
-      where: {
-        column: {
-          // request에서 받은 값을 집어넣어야 한다.
-          id: columnId,
-        },
-      },
-    });
+    const findCard = await this.cardRepository.findOne({
+      where: { columnId: createCardDto.columnId },
+      order: { order: 'DESC'}
+    })
 
-    // LexoRank 관련 코드
+    if (!findCard) {
+      createCardDto.order = 0;
+    } else {
+      createCardDto.order = findCard.order + 1;
+    }
 
     // 생성 카드 정의
-    const card = this.cardRepository.create({
-      // request에서 받은 값을 집어넣어야 한다.
-      user: {
-        id: userId,
-      },
-      column: {
-        id: columnId,
-      },
-      title: createCardDto.title,
-      content: createCardDto.content,
-      category: createCardDto.category,
-      color: createCardDto.color,
-      startDate: createCardDto.startDate,
-      endDate: createCardDto.endDate,
-    });
+    const card = this.cardRepository.create(createCardDto);
 
     // 정의된 카드 repository에 저장
     await this.cardRepository.save(card);
@@ -69,12 +55,9 @@ export class CardService {
 
   async findAll(columnId: number) {
     const foundCard = await this.cardRepository.find({
+      where: { columnId },
       select: ['id', 'title'],
-      where: {
-        column: {
-          id: columnId,
-        },
-      },
+      order: { order: 'ASC' },
     });
 
     return { foundCard, message: '카드 목록 조회 성공' };
@@ -87,36 +70,31 @@ export class CardService {
       throw new NotFoundException('해당 Card는 존재하지 않습니다.');
     }
 
-    return { card, message: '카드 조회 완료' };
+    return card;
   }
 
-  async remove(id: number) {
+  async remove(id: number, userId: number) {
+    const card = await this.findOne(id);
+
+    if (card.userId !== userId) {
+      throw new UnauthorizedException('해당 카드를 삭제할 권한이 없습니다.');
+    }
+
     const result = await this.cardRepository.delete(id);
     return { result, message: 'Card 삭제 완료' };
   }
 
-  async update(id: number, updateCardDto: UpdateCardDto) {
+  async update(userId:number, id: number, updateCardDto: UpdateCardDto) {
     // card service
-    const card = await this.availableCardById(id);
-    this.cardRepository.merge(card, updateCardDto);
-    const updatedCard = this.cardRepository.save(card);
-    return { updatedCard, message: '카드가 정상적으로 수정되었습니다.' };
-  }
+    const card = await this.findOne(id);
 
-  private async availableCardById(id: number) {
-    const card = await this.cardRepository.findOne({
-      where: {
-        id,
-      },
-    });
-
-    // relations
-
-    if (!card) {
-      throw new NotFoundException('해당 카드는 존재하지 않습니다.');
+    if (card.userId !== userId) {
+      throw new UnauthorizedException('해당 카드를 수정할 권한이 없습니다.');
     }
 
-    return card;
+    this.cardRepository.merge(card, updateCardDto);
+    const updatedCard = await this.cardRepository.save(card);
+    return { updatedCard, message: '카드가 정상적으로 수정되었습니다.' };
   }
 
   private async availableUserById(userId: number) {
@@ -126,7 +104,7 @@ export class CardService {
   // addMemberToCard
 
   async addMemberToCard(cardId: number, userId: number) {
-    const card = await this.availableCardById(cardId);
+    const card = await this.findOne(cardId);
     const user = await this.availableUserById(userId);
 
     // card.workers = [...card.workers, user];
@@ -140,14 +118,8 @@ export class CardService {
 
   async updateCardOrder(columnId: number, cardId: number, rankId: string) {
     const findAllCard = await this.cardRepository.find({
-      where: {
-        column: {
-          id: columnId,
-        },
-      },
-      order: {
-        order: 'ASC',
-      },
+      where: { columnId },
+      order: { order: 'ASC' },
     });
 
     const findIdx = findAllCard.findIndex((card) => {

@@ -9,20 +9,30 @@ import {
   Req,
   ParseIntPipe,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 // JwT? Guard? 뭔가 필요할 듯
 import { AuthGuard } from '@nestjs/passport';
+import { BoardGuard } from 'src/board/guards/board.guard';
+import { Roles } from 'src/member/decorators/role.decorator';
+import { Role } from 'src/member/types/role.type';
+import { ColumnService } from 'src/column/column.service';
+import { validate } from 'class-validator';
+import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 
 // ⭐️⭐️⭐️ 우선 User 관련된 정보는 barer 토큰으로부터 받아오기 때문에, userId를 받아오거나 하는 것들은 req에서 받아오지 않도록 해야 한다. ⭐️⭐️⭐️
 //
 
-@UseGuards(AuthGuard('jwt'))
-@Controller('card')
+@UseGuards(JwtAuthGuard, BoardGuard)
+@Controller('/board/:boardId/column/:columnId/card')
 export class CardController {
-  constructor(private readonly cardService: CardService) {}
+  constructor(
+    private readonly cardService: CardService,
+    private readonly columnService: ColumnService
+  ) {}
 
   /*
       Request
@@ -37,20 +47,28 @@ export class CardController {
       }
   */
 
-  @Post('/:columnId')
+  @Post()
+  @Roles(Role.ADMIN, Role.SUPER, Role.USER)
   async create(
+    @Param('columnId') columnId: number,
     @Body() createCardDto: CreateCardDto,
     @Req() req: any,
-    // @Param('userId', ParseIntPipe) userId: number,
-    // @Param('columnId', ParseIntPipe) columnId: number,
   ) {
     // req에서 userId를 받아주는 형태 : Bearer Token을 사용한다면 req에서 userId에서 userId를 가져올 필요가 없다.
     // 근데 지금은 req로 userId와 columnId를 받아왔다?
-    const userId = req.user.id;
-    const columnId = req['columnId'];
-
     // service에서 create 함수의 매개변수를 수정해줄 필요가 있다.
-    return this.cardService.create(createCardDto, userId, columnId);
+    try {
+      await validate(createCardDto);
+
+      await this.columnService.findColumnById(columnId);
+      createCardDto.columnId = columnId;
+  
+      const userId = req.user
+      createCardDto.userId = userId
+      return await this.cardService.create(createCardDto);
+    } catch (error) {
+      return { message: `${error}`}
+    }
   }
 
   /*
@@ -79,9 +97,13 @@ export class CardController {
       }
   */
 
-  @Get('/:columnId')
+  @Get()
   async findAll(@Param('columnId', ParseIntPipe) columnId: number) {
-    return this.cardService.findAll(columnId);
+    try {
+      return await this.cardService.findAll(columnId);
+    } catch (error) {
+      return { meesage: `${error}`}
+    }  
   }
 
   /*
@@ -92,9 +114,13 @@ export class CardController {
       }
   */
 
-  @Get('/:columnId/:id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.cardService.findOne(+id);
+  @Get('/:cardId')
+  async findOne(@Param('cardId') cardId: number) {
+    try {
+      return await   this.cardService.findOne(+cardId);
+    } catch (error) {
+      return { message: `${error}` }
+    }
   }
 
   /*
@@ -105,12 +131,26 @@ export class CardController {
       }
   */
 
-  @Patch('/:columnId/:id')
+  /*
+      Request
+      
+      {
+        
+      }
+  */
+
+  @Patch('/:cardId')
+  @Roles(Role.ADMIN, Role.SUPER, Role.USER)
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('cardId') cardId: number,
     @Body() updateCardDto: UpdateCardDto,
+    @Req() req: any
   ) {
-    return this.cardService.update(+id, updateCardDto);
+    try {
+      return await this.cardService.update(req.user, +cardId, updateCardDto);
+    } catch (error) {
+      return { message: `${error}`}
+    }
   }
 
   /*
@@ -126,9 +166,17 @@ export class CardController {
       }
   */
 
-  @Delete('/:columnId/:id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    return this.cardService.remove(+id);
+  @Delete('/:cardId')
+  @Roles(Role.ADMIN, Role.SUPER, Role.USER)
+  async remove(
+    @Param('cardId') cardId: number,
+    @Req() req: any
+  ) {
+    try {
+      return await this.cardService.remove(+cardId, req.user);
+    } catch (error) {
+      return { message: `${error}` }
+    }
   }
 
   /*
@@ -140,10 +188,11 @@ export class CardController {
       }
   */
 
-  @Patch('/:columnId/cards/:cardId')
+  @Put('/:cardId')
+  @Roles(Role.ADMIN, Role.SUPER, Role.USER)
   async updateCardOrder(
-    @Param('columnId', ParseIntPipe) columnId: number,
-    @Param('cardId', ParseIntPipe) cardId: number,
+    @Param('columnId') columnId: number,
+    @Param('cardId') cardId: number,
     @Body('rankId') rankId: string,
   ) {
     return await this.cardService.updateCardOrder(columnId, cardId, rankId);
