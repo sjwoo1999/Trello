@@ -10,5 +10,5 @@ export class CreateCardDto extends PickType(Card, [
   'category',
   'color',
   'startDate',
-  'endDate'
+  'endDate',
 ]) {}

@@ -26,7 +26,7 @@ import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 export class CardController {
   constructor(
     private readonly cardService: CardService,
-    private readonly columnService: ColumnService
+    private readonly columnService: ColumnService,
   ) {}
 
   @Post()
@@ -41,12 +41,12 @@ export class CardController {
 
       await this.columnService.findColumnById(columnId);
       createCardDto.columnId = columnId;
-  
-      const userId = req.user
-      createCardDto.userId = userId
+
+      const userId = req.user;
+      createCardDto.userId = userId;
       return await this.cardService.create(createCardDto);
     } catch (error) {
-      return { message: `${error}`}
+      return { message: `${error}` };
     }
   }
 
@@ -55,16 +55,16 @@ export class CardController {
     try {
       return await this.cardService.findAll(columnId);
     } catch (error) {
-      return { meesage: `${error}`}
-    }  
+      return { meesage: `${error}` };
+    }
   }
 
   @Get('/:cardId')
   async findOne(@Param('cardId') cardId: number) {
     try {
-      return await   this.cardService.findOne(+cardId);
+      return await this.cardService.findOne(+cardId);
     } catch (error) {
-      return { message: `${error}` }
+      return { message: `${error}` };
     }
   }
 
@@ -73,25 +73,22 @@ export class CardController {
   async update(
     @Param('cardId') cardId: number,
     @Body() updateCardDto: UpdateCardDto,
-    @Req() req: any
+    @Req() req: any,
   ) {
     try {
       return await this.cardService.update(req.user.id, +cardId, updateCardDto);
     } catch (error) {
-      return { message: `${error}`}
+      return { message: `${error}` };
     }
   }
 
   @Delete('/:cardId')
   @Roles(Role.ADMIN, Role.SUPER, Role.USER)
-  async remove(
-    @Param('cardId') cardId: number,
-    @Req() req: any
-  ) {
+  async remove(@Param('cardId') cardId: number, @Req() req: any) {
     try {
-      return await this.cardService.remove(+cardId, req.user);
+      return await this.cardService.remove(+cardId, req.user.id);
     } catch (error) {
-      return { message: `${error}` }
+      return { message: `${error}` };
     }
   }
 
