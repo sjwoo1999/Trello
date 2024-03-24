@@ -12,6 +12,6 @@ import { RoleGuard } from './guards/role.guard';
   imports: [TypeOrmModule.forFeature([Member, User]), PassportModule],
   controllers: [MemberController],
   providers: [MemberService, RoleStrategy, RoleGuard],
-  exports: [TypeOrmModule, RoleGuard],
+  exports: [TypeOrmModule, RoleGuard, MemberService],
 })
 export class MemberModule {}

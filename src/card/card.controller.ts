@@ -9,6 +9,7 @@ import {
   Req,
   ParseIntPipe,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
@@ -20,11 +21,12 @@ import { Roles } from 'src/member/decorators/role.decorator';
 import { Role } from 'src/member/types/role.type';
 import { ColumnService } from 'src/column/column.service';
 import { validate } from 'class-validator';
+import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 
 // ⭐️⭐️⭐️ 우선 User 관련된 정보는 barer 토큰으로부터 받아오기 때문에, userId를 받아오거나 하는 것들은 req에서 받아오지 않도록 해야 한다. ⭐️⭐️⭐️
 //
 
-@UseGuards(BoardGuard)
+@UseGuards(JwtAuthGuard, BoardGuard)
 @Controller('/board/:boardId/column/:columnId/card')
 export class CardController {
   constructor(
@@ -146,9 +148,10 @@ export class CardController {
   async update(
     @Param('cardId') cardId: number,
     @Body() updateCardDto: UpdateCardDto,
+    @Req() req: any
   ) {
     try {
-      return await this.cardService.update(+cardId, updateCardDto);
+      return await this.cardService.update(req.user, +cardId, updateCardDto);
     } catch (error) {
       return { message: `${error}`}
     }
@@ -167,10 +170,17 @@ export class CardController {
       }
   */
 
-  @Delete('/:columnId/:id')
+  @Delete('/:cardId')
   @Roles(Role.ADMIN, Role.SUPER, Role.USER)
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    return this.cardService.remove(+id);
+  async remove(
+    @Param('cardId') cardId: number,
+    @Req() req: any
+  ) {
+    try {
+      return await this.cardService.remove(+cardId, req.user);
+    } catch (error) {
+      return { message: `${error}` }
+    }
   }
 
   /*
@@ -182,7 +192,7 @@ export class CardController {
       }
   */
 
-  @Patch('/:cardId')
+  @Put('/:cardId')
   @Roles(Role.ADMIN, Role.SUPER, Role.USER)
   async updateCardOrder(
     @Param('columnId') columnId: number,

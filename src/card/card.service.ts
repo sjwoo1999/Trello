@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Card } from './entities/card.entity';
 import { CreateCardDto } from './dto/create-card.dto';
@@ -40,7 +41,7 @@ export class CardService {
     if (!findCard) {
       createCardDto.order = 0;
     } else {
-      createCardDto.order = findCard.order;
+      createCardDto.order = findCard.order + 1;
     }
 
     // 생성 카드 정의
@@ -72,14 +73,25 @@ export class CardService {
     return card;
   }
 
-  async remove(id: number) {
+  async remove(id: number, userId: number) {
+    const card = await this.findOne(id);
+
+    if (card.userId !== userId) {
+      throw new UnauthorizedException('해당 카드를 삭제할 권한이 없습니다.');
+    }
+
     const result = await this.cardRepository.delete(id);
     return { result, message: 'Card 삭제 완료' };
   }
 
-  async update(id: number, updateCardDto: UpdateCardDto) {
+  async update(userId:number, id: number, updateCardDto: UpdateCardDto) {
     // card service
     const card = await this.findOne(id);
+
+    if (card.userId !== userId) {
+      throw new UnauthorizedException('해당 카드를 수정할 권한이 없습니다.');
+    }
+
     this.cardRepository.merge(card, updateCardDto);
     const updatedCard = await this.cardRepository.save(card);
     return { updatedCard, message: '카드가 정상적으로 수정되었습니다.' };
@@ -109,11 +121,11 @@ export class CardService {
       where: { columnId },
       order: { order: 'ASC' },
     });
-
+    console.log('-----', findAllCard);
     const findIdx = findAllCard.findIndex((card) => {
       return card.order === parseInt(rankId);
     });
-
+    console.log('-------', findIdx);
     let moveLexoRank: LexoRank;
 
     if (findIdx === 0) {

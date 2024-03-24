@@ -1,5 +1,4 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 import { RoleGuard } from 'src/member/guards/role.guard';
 import { BoardService } from '../board.service';
 import { Reflector } from '@nestjs/core';
@@ -9,7 +8,6 @@ import { Role } from 'src/member/types/role.type';
 @Injectable()
 export class BoardGuard implements CanActivate {
   constructor(
-    private readonly jwtAuthGuard: JwtAuthGuard,
     private readonly roleGuard: RoleGuard,
     private readonly boardService: BoardService,
     private reflector: Reflector,
@@ -18,12 +16,10 @@ export class BoardGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
 
-    await this.jwtAuthGuard.canActivate(context);
-
-    const board = await this.boardService.findBoardById(req.boardId);
+    const board = await this.boardService.findBoardById(req.params.boardId);
 
     const requiredRole = this.reflector.get<Role[]>(ROLES_KEY, context.getHandler());
-    
+
     if (board.visibility === 'Public') {
       if (requiredRole) {
         return await this.roleGuard.canActivate(context);

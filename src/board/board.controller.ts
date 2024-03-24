@@ -18,11 +18,11 @@ import { Roles } from 'src/member/decorators/role.decorator';
 import { Role } from 'src/member/types/role.type';
 import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('board')
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
-  @UseGuards(JwtAuthGuard)
   @Post()
   async createBoard(@Body() createBoardDto: CreateBoardDto, @Req() req: any) {
     await validate(createBoardDto);

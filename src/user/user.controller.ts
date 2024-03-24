@@ -16,11 +16,14 @@ import { SignInDto } from './dtos/signIn.dto';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { PatchUserDto } from './dtos/patchUser.dto';
 import { JwtAuthGuard } from './guards/jwt.guard';
+import { MemberService } from 'src/member/member.service';
 
 @Controller('user')
 export class UserController {
-  memberService: any;
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly memberService: MemberService
+  ) {}
 
   @Post('/sign-up')
   async signUp(
@@ -62,7 +65,7 @@ export class UserController {
 
   //접근 가능한 보드 조회 ..
   @UseGuards(JwtAuthGuard)
-  @Get('/user/activate')
+  @Get('/activate')
   async boardCanAccess(@Request() req) {
     const userId = req.user.id;
     const data = await this.memberService.boardCanAccess(userId);
@@ -74,7 +77,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch('/user/patch')
+  @Patch('/patch')
   async patchUser(@Request() req, @Body() patchUser: PatchUserDto) {
     const userId = req.user.id;
     await this.userService.patchUser(userId, patchUser);
@@ -85,7 +88,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete('/user/leave')
+  @Delete('/leave')
   async deleteUser(@Request() req) {
     const userId = req.user.id;
     await this.userService.deleteUser(userId);
