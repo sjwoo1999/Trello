@@ -21,7 +21,7 @@ import { UserModule } from 'src/user/user.module';
     UserModule,
     /*, AuthModule*/
   ],
-  controllers: [],
-  providers: [],
+  controllers: [CardController],
+  providers: [CardService],
 })
 export class CardModule {}

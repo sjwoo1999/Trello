@@ -39,10 +39,9 @@ export class CardController {
   @Post('/:columnId')
   @UseGuards(AuthGuard('jwt'))
   async create(
-    @Param('userId', ParseIntPipe) userId: number,
     @Param('columnId', ParseIntPipe) columnId: number,
     @Body() createCardDto: CreateCardDto,
-    @Req() req: Request,
+    @Req() req: any,
   ) {
     // req에서 userId를 받아주는 형태 : Bearer Token을 사용한다면 req에서 userId에서 userId를 가져올 필요가 없다.
     // 근데 지금은 req로 userId와 columnId를 받아왔다?
@@ -50,9 +49,13 @@ export class CardController {
     // const userId = req['userId'];
     // const columnId = req['columnId'];
 
+    const user = req.user;
+
     // service에서 create 함수의 매개변수를 수정해줄 필요가 있다.
-    return await this.cardService.create(createCardDto, userId, columnId);
+    return await this.cardService.create(createCardDto, user, columnId);
   }
+
+  // order는 순서만 하는 게 아니라 찾아서 넣어주는 ..
 
   /*
       Request

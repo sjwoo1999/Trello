@@ -28,5 +28,6 @@ import { MemberModule } from 'src/member/member.module';
   ],
   controllers: [UserController],
   providers: [UserService, JwtStrategy],
+  exports: [UserService],
 })
 export class UserModule {}

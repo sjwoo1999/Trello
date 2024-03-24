@@ -26,16 +26,13 @@ export class Card {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @IsNumber()
   @Column({ type: 'int', nullable: false })
   columnId: number;
 
-  @IsNumber()
   @Column({ type: 'int', nullable: false })
   order: number;
 
-  @IsNumber()
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable: false })
   userId: number;
 
   @IsString()
@@ -72,14 +69,14 @@ export class Card {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Comment, (comment) => comment.card, { cascade: true })
+  @OneToMany(() => Comment, (comment) => comment.card)
   comments: Comment[];
 
-  @ManyToOne(() => User, (user) => user.cards, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.cards)
   @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
   user: User;
 
-  @ManyToOne(() => Columns, (column) => column.cards, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Columns, (column) => column.cards)
   @JoinColumn({ name: 'columnId', referencedColumnName: 'id' })
   column: Columns;
 }
