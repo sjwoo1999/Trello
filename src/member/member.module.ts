@@ -11,6 +11,6 @@ import { RoleStrategy } from './strategies/role.strategy';
   imports: [TypeOrmModule.forFeature([Member, User]), PassportModule],
   controllers: [MemberController],
   providers: [MemberService, RoleStrategy],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, MemberService],
 })
 export class MemberModule {}
