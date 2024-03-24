@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -53,7 +57,7 @@ export class CommentService {
       where: { id: commentId },
     });
     if (!comment) {
-      throw new Error('해당 ID의 댓글을 찾을 수 없습니다.');
+      throw new NotFoundException('해당 ID의 댓글을 찾을 수 없습니다.');
     }
     return comment;
   }
@@ -68,10 +72,10 @@ export class CommentService {
       where: { id: commentId },
     });
     if (!comment) {
-      throw new Error('해당 ID의 댓글을 찾을 수 없습니다.');
+      throw new NotFoundException('해당 ID의 댓글을 찾을 수 없습니다.');
     }
     if (comment.userId !== userId) {
-      throw new Error('수정할 권한이 없습니다.');
+      throw new BadRequestException('수정할 권한이 없습니다.');
     }
 
     await this.commentRepository.update(commentId, updateCommentDto);
@@ -79,7 +83,7 @@ export class CommentService {
       where: { id: commentId },
     }); // 수정된 댓글 조회
     if (!updatedComment) {
-      throw new Error('수정된 댓글을 찾을 수 없습니다.');
+      throw new NotFoundException('수정된 댓글을 찾을 수 없습니다.');
     }
     return {
       message: '댓글이 성공적으로 수정되었습니다.',
@@ -99,10 +103,10 @@ export class CommentService {
       where: { id: commentId },
     });
     if (!comment) {
-      throw new Error('해당 ID의 댓글을 찾을 수 없습니다.');
+      throw new NotFoundException('해당 ID의 댓글을 찾을 수 없습니다.');
     }
     if (comment.userId !== userId) {
-      throw new Error('삭제할 권한이 없습니다.');
+      throw new BadRequestException('삭제할 권한이 없습니다.');
     }
 
     const result = await this.commentRepository.delete(commentId);
