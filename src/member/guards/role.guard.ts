@@ -20,7 +20,7 @@ export class RoleGuard implements CanActivate {
     }
     const request = context.switchToHttp().getRequest();
     const userId = request.user.id;
-    const boardId = request.body.boardId;
+    const boardId = request.body.boardId; // << 만약에 카드아이디가 들어오면 그걸통해 보드아이디를 가져오는 걸 작성하시면 되겠죠!
     return await this.strategy.validate(userId, boardId, requiredRole);
   }
 }
