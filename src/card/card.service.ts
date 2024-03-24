@@ -8,18 +8,35 @@ import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
+import { UserService } from 'src/user/user.service';
+import { LexoRank } from 'lexorank';
 
 @Injectable()
 export class CardService {
   constructor(
-    @InjectRepository(Card) private readonly cardRepository: Repository<Card>,
-    // User? Member Service Inject 해줘야 한다.
+    @InjectRepository(Card)
+    private readonly cardRepository: Repository<Card>,
+    private readonly usersService: UserService,
   ) {}
 
+  // 마감일이 시작일 이전인지 또는 마감일이 오늘 이전인지 확인(지정된 경우).
   async create(createCardDto: CreateCardDto, userId: number, columnId: number) {
+    if (
+      createCardDto.startDate &&
+      createCardDto.endDate &&
+      (createCardDto.endDate < createCardDto.startDate ||
+        createCardDto.endDate < new Date())
+    ) {
+      throw new BadRequestException(
+        '마감일은 시작일 이후이거나 오늘 이후여야 합니다.',
+      );
+    }
     const findCards = await this.cardRepository.find({
+      // request에서 받은 값을 집어넣어야 한다.
+
       where: {
         column: {
+          // request에서 받은 값을 집어넣어야 한다.
           id: columnId,
         },
       },
@@ -29,6 +46,10 @@ export class CardService {
 
     // 생성 카드 정의
     const card = this.cardRepository.create({
+      // request에서 받은 값을 집어넣어야 한다.
+      user: {
+        id: userId,
+      },
       column: {
         id: columnId,
       },
@@ -98,9 +119,60 @@ export class CardService {
     return card;
   }
 
+  private async availableUserById(userId: number) {
+    const user = await this.usersService.getUser(userId);
+  }
+
+  // addMemberToCard
+
+  async addMemberToCard(cardId: number, userId: number) {
+    const card = await this.availableCardById(cardId);
+    const user = await this.availableUserById(userId);
+
+    // card.workers = [...card.workers, user];
+
+    await this.cardRepository.save(card);
+
+    return { newMember: user, message: '작업자 추가' };
+  }
+
   // updateCardOrder
 
   async updateCardOrder(columnId: number, cardId: number, rankId: string) {
-    //
+    const findAllCard = await this.cardRepository.find({
+      where: {
+        column: {
+          id: columnId,
+        },
+      },
+      order: {
+        order: 'ASC',
+      },
+    });
+
+    const findIdx = findAllCard.findIndex((card) => {
+      return card.order === parseInt(rankId);
+    });
+
+    let moveLexoRank: LexoRank;
+
+    if (findIdx === 0) {
+      moveLexoRank = LexoRank.parse(
+        findAllCard[findIdx].order.toString(),
+      ).genPrev();
+    } else if (findIdx === findAllCard.length - 1) {
+      moveLexoRank = LexoRank.parse(
+        findAllCard[findIdx].order.toString(),
+      ).genNext();
+    } else {
+      moveLexoRank = LexoRank.parse(
+        findAllCard[findIdx].order.toString(),
+      ).between(LexoRank.parse(findAllCard[findIdx - 1].toString()));
+    }
+
+    await this.cardRepository.update(
+      { id: cardId },
+      { order: parseInt(moveLexoRank.toString()) },
+    );
   }
 }

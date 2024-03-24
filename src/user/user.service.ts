@@ -158,4 +158,24 @@ export class UserService {
     const user = await this.getUser(userId);
     await this.userRepository.delete({ id: user.id });
   }
+
+  // async emailUser(email){
+  //   const send
+  //     const transporter = nodemailer.createTransport({
+  //       service: "GMail", // 메일 서비스 이름
+  //       port: 587, // 메일 서버 포트 (보안을 위해 TLS를 지원하는 587 포트 사용을 권장한다)
+  //       host: "smtp.gmail.com", // 메일 서버 도메인 또는 IP
+  //       secure: true, // TLS 사용 여부
+  //       requireTLS: true, // TLS 연결 시도 여부
+  //       auth: { // 인증정보 (여기에 연동하고자 하는 GMail의 이메일 주소와 비밀번호를 넣는다)
+  //         user:process.env.MAILER_EMAIL,// 환경변수에 정의한 이메일 주소와 비밀번호를 가져온다.
+  //         pass:process.env.MAILER_PASSWORD,
+  //       },
+  //     });
+  // }
+
+
+
 }
+
+

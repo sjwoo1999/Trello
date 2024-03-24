@@ -14,9 +14,9 @@ import { CreateColumnDto } from './dto/create-column.dto';
 import { BoardService } from 'src/board/board.service';
 import { validate } from 'class-validator';
 import { UpdateColumnDto } from './dto/update-column.dto';
-import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
+import { BoardGuard } from 'src/board/guards/board.guard';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(BoardGuard)
 @Controller('/board/:boardId/column')
 export class ColumnController {
   constructor(

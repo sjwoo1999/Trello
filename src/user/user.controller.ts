@@ -19,6 +19,7 @@ import { JwtAuthGuard } from './guards/jwt.guard';
 
 @Controller('user')
 export class UserController {
+  memberService: any;
   constructor(private readonly userService: UserService) {}
 
   @Post('/sign-up')
@@ -48,19 +49,32 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/user')
-  async getUser(@Request() req) {
-    const userId = req.user.id;
+  @Get('/info')
+  async getUser(@Request() req){
+    const userId = req.user.id; //
     const data = await this.userService.getUser(userId);
     return {
+        statusCode: HttpStatus.OK,
+        message: '정보 조회에 성공했습니다.',
+        data,
+    }
+  }
+
+  //접근 가능한 보드 조회 ..
+  @UseGuards(JwtAuthGuard)
+  @Get('/user/activate')
+  async boardCanAccess(@Request() req) {
+    const userId = req.user.id;
+    const data = await this.memberService.boardCanAccess(userId);
+    return {
       statusCode: HttpStatus.OK,
-      message: '정보 조회에 성공했습니다.',
+      message: '조회에 성공했습니다.',
       data,
     };
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch('/user')
+  @Patch('/user/patch')
   async patchUser(@Request() req, @Body() patchUser: PatchUserDto) {
     const userId = req.user.id;
     await this.userService.patchUser(userId, patchUser);
@@ -71,7 +85,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete('/user')
+  @Delete('/user/leave')
   async deleteUser(@Request() req) {
     const userId = req.user.id;
     await this.userService.deleteUser(userId);

@@ -16,6 +16,7 @@ import { Columns } from './column/entities/column.entity';
 import { Card } from './card/entities/card.entity';
 import { Comment } from './comment/entities/comment.entity';
 import { Member } from './member/entities/member.entity';
+import { MemberModule } from './member/member.module';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -48,6 +49,8 @@ const typeOrmModuleOptions = {
         DB_SYNC: Joi.boolean().required(),
         PASSWORD_HASH_ROUNDS: Joi.number().required(),
         ROLE_ADMIN_PASSWORD: Joi.string().required(),
+        MAILER_EMAIL: Joi.string().required(),
+        MAILER_PASSWORD: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
@@ -56,6 +59,7 @@ const typeOrmModuleOptions = {
     ColumnModule,
     CardModule,
     CommentModule,
+    MemberModule,
   ],
   controllers: [AppController],
   providers: [

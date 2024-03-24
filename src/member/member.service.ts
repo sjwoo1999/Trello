@@ -14,15 +14,15 @@ export class MemberService {
     @InjectRepository(User) private readonly userRepository:Repository<User>,
     @InjectRepository(Member) private readonly memberRepository:Repository<Member>){}
   async invite(userId: number, boardId: number, {email}:EmailMemberDto) {
-    const user = this.isSignUp(email);
+    const user = await this.isSignUp(email);
     if (!user){
-      //노드메일러
+      throw new BadRequestException('사용자가 존재하지 않습니다.')
     }
-    const member = await this.isJoinBoard((await user).id, boardId)
+    const member = await this.isJoinBoard(user.id, boardId)
     if (member){
       throw new BadRequestException('이미 가입되어있는 사용자입니다.')
     }
-    await this.memberRepository.save({ userId, boardId })
+    await this.memberRepository.save({ userId: user.id, boardId, role: Role.USER })
   }
 
   async boardCanAccess(userId: number) {
@@ -31,10 +31,12 @@ export class MemberService {
   }
 
   async accessMembers(boardId: number) {
-    return await this.memberRepository.find({
-      where:{boardId}, 
-      select: {user: {email: true}
-    }});
+    const members = await this.memberRepository.find({
+      where: {boardId},
+      relations: ['user']
+    });
+    const emails =  members.map(member => member.user.email);
+    return emails;
   }
 
   async patchMemberRole(boardId: number, {email, patchRole}:PatchRoleDto) {
@@ -70,6 +72,7 @@ export class MemberService {
   }
 
   async boardKick(userId: number, boardId: number, {email}:EmailMemberDto) {
+    console.log(email)
     const user = await this.isSignUp(email);
     if (!user){
       throw new BadRequestException('사용자가 없습니다.')
@@ -89,12 +92,12 @@ export class MemberService {
   }
 
 
-  async isSignUp(email){
+  async isSignUp(email:string){
     return await this.userRepository.findOne({where:{email}})
   }
 
 
-  async isJoinBoard(userId, boardId){
+  async isJoinBoard(userId:number, boardId:number){
     return await this.memberRepository.findOne({where:{userId, boardId}})
   }
 }

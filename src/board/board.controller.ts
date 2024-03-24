@@ -13,13 +13,16 @@ import { BoardService } from './board.service';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { validate } from 'class-validator';
 import { UpdateBoardDto } from './dto/update-board.dto';
+import { BoardGuard } from './guards/board.guard';
+import { Roles } from 'src/member/decorators/role.decorator';
+import { Role } from 'src/member/types/role.type';
 import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 
-@UseGuards(JwtAuthGuard)
 @Controller('board')
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   async createBoard(@Body() createBoardDto: CreateBoardDto, @Req() req: any) {
     await validate(createBoardDto);
@@ -28,6 +31,7 @@ export class BoardController {
     return await this.boardService.createBoard(createBoardDto, userId);
   }
 
+  @UseGuards(BoardGuard)
   @Get('/:boardId')
   async findBoardById(@Param('boardId') boardId: number) {
     try {
@@ -37,6 +41,8 @@ export class BoardController {
     }
   }
 
+  @UseGuards(BoardGuard)
+  @Roles(Role.SUPER, Role.SUPER)
   @Patch('/:boardId')
   async editBoard(
     @Param('boardId') boardId: number,
@@ -51,6 +57,8 @@ export class BoardController {
     }
   }
 
+  @UseGuards(BoardGuard)
+  @Roles(Role.SUPER, Role.SUPER)
   @Delete('/:boardId')
   async deleteBoard(@Param('boardId') boardId: number) {
     try {
