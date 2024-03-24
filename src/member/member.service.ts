@@ -88,7 +88,7 @@ export class MemberService {
     if (nowUser.role === member.role){
       throw new BadRequestException('같은 권한을 가진 유저는 강제퇴장 시킬 수 없습니다.')
     }
-      await this.memberRepository.delete(member)
+      await this.memberRepository.delete(member.id)
   }
 
 
