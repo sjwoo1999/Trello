@@ -21,9 +21,8 @@ import { MemberService } from 'src/member/member.service';
 @Controller('user')
 export class UserController {
   constructor(
-    private readonly userService: UserService,
-    private readonly memberService: MemberService
-  ) {}
+    private readonly memberService:MemberService,
+    private readonly userService: UserService) {}
 
   @Post('/sign-up')
   async signUp(

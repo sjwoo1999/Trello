@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Card } from 'src/card/entities/card.entity';
@@ -21,46 +20,31 @@ export class CommentService {
     private readonly memberRepository: Repository<Member>,
   ) {}
 
-  comments: any[] = []; //댓글 배열 초기화
-
   // 댓글 작성 메서드
   async create(
     createCommentDto: CreateCommentDto,
     userId: number,
     cardId: number,
-  ): Promise<string> {
-    //cardId로 bordId 찾기
-    // const card = await this.cardRepository.findOne({
-    //   where: { id: cardId },
-    // });
-    // const column = await this.columnRepository.findOne({
-    //   where: { id: card.columnId },
-    // });
-    // console.log(card);
-    // 보드에 초대된 멤버인지 확인
-    // 보드에 초대된 멤버인 경우에만 댓글 작성
+  ): Promise<{ message: string; comment: Comment }> {
     const newComment = {
       content: createCommentDto.content,
       userId: userId,
       cardId: cardId,
     };
     console.log(newComment);
-    await this.commentRepository.save(newComment);
-    return '댓글이 성공적으로 작성되었습니다.';
+    const createdComment = await this.commentRepository.save(newComment);
+    return {
+      message: '댓글이 성공적으로 작성되었습니다.',
+      comment: createdComment,
+    };
+    // await this.commentRepository.save(newComment);
+    // return '댓글이 성공적으로 작성되었습니다.';
   }
-
-  // // 보드에 초대된 멤버인지 확인하는 메서드
-  // async isMemberOfBoard(userId: number, boardId: number): Promise<boolean> {
-  //   const member = await this.memberRepository.findOne({
-  //     where: { userId, boardId },
-  //   });
-  //   if (member) return true;
-  //   return false;
-  // }
 
   // 댓글 조회 메서드
   async findAll(cardId: number): Promise<Comment[]> {
-    return await this.commentRepository.findBy({ cardId });
+    console.log('카드 ID:', +cardId); // 카드 ID 확인을 위한 로그 추가
+    return await this.commentRepository.find({ where: { cardId: cardId } });
   }
 
   // 특정 댓글 조회 메서드
@@ -79,7 +63,7 @@ export class CommentService {
     commentId: number,
     updateCommentDto: any,
     userId: number,
-  ): Promise<string> {
+  ): Promise<{ message: string; comment: Comment }> {
     const comment = await this.commentRepository.findOne({
       where: { id: commentId },
     });
@@ -87,15 +71,30 @@ export class CommentService {
       throw new Error('해당 ID의 댓글을 찾을 수 없습니다.');
     }
     if (comment.userId !== userId) {
-      throw new Error('삭제할 권한이 없습니다.');
+      throw new Error('수정할 권한이 없습니다.');
     }
 
     await this.commentRepository.update(commentId, updateCommentDto);
-    return '댓글이 성공적으로 수정되었습니다.';
+    const updatedComment = await this.commentRepository.findOne({
+      where: { id: commentId },
+    }); // 수정된 댓글 조회
+    if (!updatedComment) {
+      throw new Error('수정된 댓글을 찾을 수 없습니다.');
+    }
+    return {
+      message: '댓글이 성공적으로 수정되었습니다.',
+      comment: updatedComment,
+    };
+
+    // await this.commentRepository.update(commentId, updateCommentDto);
+    // return '댓글이 성공적으로 수정되었습니다.';
   }
 
   // 댓글 삭제 메서드
-  async delete(commentId: number, userId: number): Promise<string> {
+  async delete(
+    commentId: number,
+    userId: number,
+  ): Promise<{ message: string }> {
     const comment = await this.commentRepository.findOne({
       where: { id: commentId },
     });
@@ -108,6 +107,6 @@ export class CommentService {
 
     const result = await this.commentRepository.delete(commentId);
     console.log('삭제 결과', result);
-    return '댓글이 성공적으로 삭제되었습니다.';
+    return { message: '댓글이 성공적으로 삭제되었습니다.' };
   }
 }

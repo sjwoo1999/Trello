@@ -121,11 +121,11 @@ export class CardService {
       where: { columnId },
       order: { order: 'ASC' },
     });
-    console.log('-----', findAllCard);
+
     const findIdx = findAllCard.findIndex((card) => {
       return card.order === parseInt(rankId);
     });
-    console.log('-------', findIdx);
+
     let moveLexoRank: LexoRank;
 
     if (findIdx === 0) {
