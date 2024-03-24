@@ -28,12 +28,8 @@ import { JwtAuthGuard } from './guards/jwt.guard';
     }),
   ],
   controllers: [UserController],
-<<<<<<< HEAD
-  providers: [UserService, JwtStrategy],
-  exports: [UserService],
-=======
+
   providers: [UserService, JwtStrategy, JwtAuthGuard],
-  exports: [JwtAuthGuard, UserService]
->>>>>>> f2c38f29e167720291ecd999f0316c2a48dcdddc
+  exports: [JwtAuthGuard, UserService],
 })
 export class UserModule {}

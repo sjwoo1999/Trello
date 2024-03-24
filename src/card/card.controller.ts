@@ -31,7 +31,7 @@ import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 export class CardController {
   constructor(
     private readonly cardService: CardService,
-    private readonly columnService: ColumnService
+    private readonly columnService: ColumnService,
   ) {}
 
   /*
@@ -50,40 +50,26 @@ export class CardController {
   @Post()
   @Roles(Role.ADMIN, Role.SUPER, Role.USER)
   async create(
-<<<<<<< HEAD
-    @Param('columnId', ParseIntPipe) columnId: number,
-=======
     @Param('columnId') columnId: number,
->>>>>>> f2c38f29e167720291ecd999f0316c2a48dcdddc
     @Body() createCardDto: CreateCardDto,
     @Req() req: any,
   ) {
     // req에서 userId를 받아주는 형태 : Bearer Token을 사용한다면 req에서 userId에서 userId를 가져올 필요가 없다.
     // 근데 지금은 req로 userId와 columnId를 받아왔다?
-<<<<<<< HEAD
-    // 이 부분 어떻게 수정해야 할지 고민 필요
-    // const userId = req['userId'];
-    // const columnId = req['columnId'];
 
-    const user = req.user;
-
-    // service에서 create 함수의 매개변수를 수정해줄 필요가 있다.
-    return await this.cardService.create(createCardDto, user, columnId);
-=======
     // service에서 create 함수의 매개변수를 수정해줄 필요가 있다.
     try {
       await validate(createCardDto);
 
       await this.columnService.findColumnById(columnId);
       createCardDto.columnId = columnId;
-  
-      const userId = req.user
-      createCardDto.userId = userId
+
+      const userId = req.user;
+      createCardDto.userId = userId;
       return await this.cardService.create(createCardDto);
     } catch (error) {
-      return { message: `${error}`}
+      return { message: `${error}` };
     }
->>>>>>> f2c38f29e167720291ecd999f0316c2a48dcdddc
   }
 
   // order는 순서만 하는 게 아니라 찾아서 넣어주는 ..
@@ -119,8 +105,8 @@ export class CardController {
     try {
       return await this.cardService.findAll(columnId);
     } catch (error) {
-      return { meesage: `${error}`}
-    }  
+      return { meesage: `${error}` };
+    }
   }
 
   /*
@@ -134,9 +120,9 @@ export class CardController {
   @Get('/:cardId')
   async findOne(@Param('cardId') cardId: number) {
     try {
-      return await   this.cardService.findOne(+cardId);
+      return await this.cardService.findOne(+cardId);
     } catch (error) {
-      return { message: `${error}` }
+      return { message: `${error}` };
     }
   }
 
@@ -161,12 +147,12 @@ export class CardController {
   async update(
     @Param('cardId') cardId: number,
     @Body() updateCardDto: UpdateCardDto,
-    @Req() req: any
+    @Req() req: any,
   ) {
     try {
-      return await this.cardService.update(req.user, +cardId, updateCardDto);
+      return await this.cardService.update(req.user.id, +cardId, updateCardDto);
     } catch (error) {
-      return { message: `${error}`}
+      return { message: `${error}` };
     }
   }
 
@@ -185,14 +171,11 @@ export class CardController {
 
   @Delete('/:cardId')
   @Roles(Role.ADMIN, Role.SUPER, Role.USER)
-  async remove(
-    @Param('cardId') cardId: number,
-    @Req() req: any
-  ) {
+  async remove(@Param('cardId') cardId: number, @Req() req: any) {
     try {
-      return await this.cardService.remove(+cardId, req.user);
+      return await this.cardService.remove(+cardId, req.user.id);
     } catch (error) {
-      return { message: `${error}` }
+      return { message: `${error}` };
     }
   }
 
