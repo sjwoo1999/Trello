@@ -11,5 +11,6 @@ import { MemberModule } from 'src/member/member.module';
   imports: [TypeOrmModule.forFeature([Columns]), BoardModule, UserModule, MemberModule],
   controllers: [ColumnController],
   providers: [ColumnService],
+  exports: [ColumnService]
 })
 export class ColumnModule {}

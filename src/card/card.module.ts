@@ -5,6 +5,8 @@ import { CardController } from './card.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ColumnModule } from 'src/column/column.module';
 import { UserModule } from 'src/user/user.module';
+import { BoardModule } from 'src/board/board.module';
+import { MemberModule } from 'src/member/member.module';
 //
 //import { JwtModule } from '@nestjs/jwt';
 //import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -19,9 +21,11 @@ import { UserModule } from 'src/user/user.module';
     TypeOrmModule.forFeature([Card]),
     ColumnModule,
     UserModule,
+    BoardModule,
+    MemberModule
     /*, AuthModule*/
   ],
-  controllers: [],
-  providers: [],
+  controllers: [CardController],
+  providers: [CardService],
 })
 export class CardModule {}

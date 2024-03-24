@@ -42,7 +42,7 @@ export class BoardController {
   }
 
   @UseGuards(BoardGuard)
-  @Roles(Role.SUPER, Role.SUPER)
+  @Roles(Role.SUPER, Role.ADMIN)
   @Patch('/:boardId')
   async editBoard(
     @Param('boardId') boardId: number,
