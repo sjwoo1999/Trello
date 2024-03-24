@@ -98,7 +98,7 @@ export class MemberService {
         '같은 권한을 가진 유저는 강제퇴장 시킬 수 없습니다.',
       );
     }
-    await this.memberRepository.delete(member.id);
+    await this.memberRepository.delete(member.id)
   }
 
   async isSignUp(email: string) {
