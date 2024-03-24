@@ -8,19 +8,16 @@ import { Card } from './entities/card.entity';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
-import { UserService } from 'src/user/user.service';
-import { LexoRank } from 'lexorank';
+import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
 export class CardService {
   constructor(
     @InjectRepository(Card)
     private readonly cardRepository: Repository<Card>,
-    private readonly usersService: UserService,
+    private dataSource: DataSource,
   ) {}
 
-  // 마감일이 시작일 이전인지 또는 마감일이 오늘 이전인지 확인(지정된 경우).
   async create(createCardDto: CreateCardDto) {
     if (
       createCardDto.startDate &&
@@ -44,10 +41,8 @@ export class CardService {
       createCardDto.order = findCard.order + 1;
     }
 
-    // 생성 카드 정의
     const card = this.cardRepository.create(createCardDto);
 
-    // 정의된 카드 repository에 저장
     await this.cardRepository.save(card);
 
     return { card, message: '카드 생성 완료' };
@@ -56,11 +51,11 @@ export class CardService {
   async findAll(columnId: number) {
     const foundCard = await this.cardRepository.find({
       where: { columnId },
-      select: ['id', 'title'],
+      select: ['id', 'title', 'order'],
       order: { order: 'ASC' },
     });
 
-    return { foundCard, message: '카드 목록 조회 성공' };
+    return foundCard;
   }
 
   async findOne(id: number) {
@@ -85,7 +80,6 @@ export class CardService {
   }
 
   async update(userId:number, id: number, updateCardDto: UpdateCardDto) {
-    // card service
     const card = await this.findOne(id);
 
     if (card.userId !== userId) {
@@ -97,54 +91,54 @@ export class CardService {
     return { updatedCard, message: '카드가 정상적으로 수정되었습니다.' };
   }
 
-  private async availableUserById(userId: number) {
-    const user = await this.usersService.getUser(userId);
-  }
+  async updateCardOrder(columnId: number, cardId: number, order: number) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-  // addMemberToCard
+    try {
+      const cards = await this.findAll(columnId);
+      const card = await this.findOne(cardId);
 
-  async addMemberToCard(cardId: number, userId: number) {
-    const card = await this.findOne(cardId);
-    const user = await this.availableUserById(userId);
+      if (cards.length <= order) {
+        throw new Error('전체 카드의 수보다 큰 값으로 이동할 수 없습니다.');
+      }
+      
+      const reorderCards = await this.reorder(cards, card.order, order);
 
-    // card.workers = [...card.workers, user];
+      await queryRunner.manager.save(Card, reorderCards);
 
-    await this.cardRepository.save(card);
+      await queryRunner.commitTransaction();
 
-    return { newMember: user, message: '작업자 추가' };
-  }
+      const newCards = await this.findAll(columnId);
 
-  // updateCardOrder
-
-  async updateCardOrder(columnId: number, cardId: number, rankId: string) {
-    const findAllCard = await this.cardRepository.find({
-      where: { columnId },
-      order: { order: 'ASC' },
-    });
-
-    const findIdx = findAllCard.findIndex((card) => {
-      return card.order === parseInt(rankId);
-    });
-
-    let moveLexoRank: LexoRank;
-
-    if (findIdx === 0) {
-      moveLexoRank = LexoRank.parse(
-        findAllCard[findIdx].order.toString(),
-      ).genPrev();
-    } else if (findIdx === findAllCard.length - 1) {
-      moveLexoRank = LexoRank.parse(
-        findAllCard[findIdx].order.toString(),
-      ).genNext();
-    } else {
-      moveLexoRank = LexoRank.parse(
-        findAllCard[findIdx].order.toString(),
-      ).between(LexoRank.parse(findAllCard[findIdx - 1].toString()));
+      return newCards;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      return { message: `${error}` };
+    } finally {
+      await queryRunner.release();
     }
+  }
 
-    await this.cardRepository.update(
-      { id: cardId },
-      { order: parseInt(moveLexoRank.toString()) },
-    );
+  async reorder(cards: Card[], order: number, reorder: number) {
+    const reorderCards = cards.map((card) => {
+      if (reorder < order) {
+        if (card.order >= reorder && card.order < order) {
+          return { ...card, order: card.order + 1 };
+        } else if (card.order === order) {
+          return { ...card, order: reorder };
+        }
+      } else {
+        if (card.order > order && card.order <= reorder) {
+          return { ...card, order: card.order - 1 };
+        } else if (card.order === order) {
+          return { ...card, order: reorder };
+        }
+      }
+    });
+    const newCards = reorderCards.filter((card) => card !== undefined);
+
+    return newCards;
   }
 }

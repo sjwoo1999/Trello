@@ -99,8 +99,12 @@ export class ColumnService {
     await queryRunner.startTransaction();
 
     try {
-      const columns = await this.findAllColumns(boardId); // 해당 보드의 전체 컬럼 조회
-      const column = await this.findColumnById(columnId); // 바꿀 컬럼 조회
+      const columns = await this.findAllColumns(boardId);
+      const column = await this.findColumnById(columnId);
+
+      if (columns.length <= order) {
+        throw new Error('전체 컬럼의 수보다 큰 값으로 이동할 수 없습니다.');
+      }
 
       const reorderColumns = await this.reorder(columns, column.order, order);
 
