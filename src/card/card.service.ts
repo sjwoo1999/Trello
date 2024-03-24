@@ -11,7 +11,6 @@ import { Not, Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
 import { LexoRank } from 'lexorank';
 
-
 @Injectable()
 export class CardService {
   constructor(
@@ -33,8 +32,11 @@ export class CardService {
       );
     }
     const findCards = await this.cardRepository.find({
+      // request에서 받은 값을 집어넣어야 한다.
+
       where: {
         column: {
+          // request에서 받은 값을 집어넣어야 한다.
           id: columnId,
         },
       },
@@ -44,6 +46,10 @@ export class CardService {
 
     // 생성 카드 정의
     const card = this.cardRepository.create({
+      // request에서 받은 값을 집어넣어야 한다.
+      user: {
+        id: userId,
+      },
       column: {
         id: columnId,
       },
@@ -145,24 +151,28 @@ export class CardService {
     });
 
     const findIdx = findAllCard.findIndex((card) => {
-      return card.order === rankId;
+      return card.order === parseInt(rankId);
     });
 
     let moveLexoRank: LexoRank;
 
     if (findIdx === 0) {
-      moveLexoRank = LexoRank.parse(findAllCard[findIdx].order).genPrev();
+      moveLexoRank = LexoRank.parse(
+        findAllCard[findIdx].order.toString(),
+      ).genPrev();
     } else if (findIdx === findAllCard.length - 1) {
-      moveLexoRank = LexoRank.parse(findAllCard[findIdx].order).genNext();
+      moveLexoRank = LexoRank.parse(
+        findAllCard[findIdx].order.toString(),
+      ).genNext();
     } else {
-      moveLexoRank = LexoRank.parse(findAllCard[findIdx].order).between(
-        LexoRank.parse(findAllCard[findIdx - 1].order),
-      );
+      moveLexoRank = LexoRank.parse(
+        findAllCard[findIdx].order.toString(),
+      ).between(LexoRank.parse(findAllCard[findIdx - 1].toString()));
     }
 
     await this.cardRepository.update(
       { id: cardId },
-      { order: moveLexoRank.toString() },
+      { order: parseInt(moveLexoRank.toString()) },
     );
   }
 }
