@@ -19,8 +19,7 @@ import { AuthGuard } from '@nestjs/passport';
 // ⭐️⭐️⭐️ 우선 User 관련된 정보는 barer 토큰으로부터 받아오기 때문에, userId를 받아오거나 하는 것들은 req에서 받아오지 않도록 해야 한다. ⭐️⭐️⭐️
 //
 
-@UseGuards(AuthGuard('jwt'))
-@Controller('card')
+@Controller('/card')
 export class CardController {
   constructor(private readonly cardService: CardService) {}
 
@@ -38,19 +37,21 @@ export class CardController {
   */
 
   @Post('/:columnId')
+  @UseGuards(AuthGuard('jwt'))
   async create(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Param('columnId', ParseIntPipe) columnId: number,
     @Body() createCardDto: CreateCardDto,
     @Req() req: Request,
-    // @Param('userId', ParseIntPipe) userId: number,
-    // @Param('columnId', ParseIntPipe) columnId: number,
   ) {
     // req에서 userId를 받아주는 형태 : Bearer Token을 사용한다면 req에서 userId에서 userId를 가져올 필요가 없다.
     // 근데 지금은 req로 userId와 columnId를 받아왔다?
-    const userId = req['userId'];
-    const columnId = req['columnId'];
+    // 이 부분 어떻게 수정해야 할지 고민 필요
+    // const userId = req['userId'];
+    // const columnId = req['columnId'];
 
     // service에서 create 함수의 매개변수를 수정해줄 필요가 있다.
-    return this.cardService.create(createCardDto, userId, columnId);
+    return await this.cardService.create(createCardDto, userId, columnId);
   }
 
   /*
@@ -79,10 +80,10 @@ export class CardController {
       }
   */
 
-  @Get('/:columnId')
-  async findAll(@Param('columnId', ParseIntPipe) columnId: number) {
-    return this.cardService.findAll(columnId);
-  }
+  // @Get('/:columnId')
+  // async findAll(@Param('columnId', ParseIntPipe) columnId: number) {
+  //   return this.cardService.findAll(columnId);
+  // }
 
   /*
       Request
@@ -92,10 +93,10 @@ export class CardController {
       }
   */
 
-  @Get('/:columnId/:id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.cardService.findOne(+id);
-  }
+  // @Get('/:columnId/:id')
+  // async findOne(@Param('id', ParseIntPipe) id: number) {
+  //   return this.cardService.findOne(+id);
+  // }
 
   /*
       Request
