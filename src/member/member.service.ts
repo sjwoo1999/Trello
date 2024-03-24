@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { EmailMemberDto } from './dto/emailMember.dto';
 import { Repository } from 'typeorm';
 import { Member } from './entities/member.entity';
