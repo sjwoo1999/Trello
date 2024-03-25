@@ -1,4 +1,11 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateCardDto } from './create-card.dto';
+import { PickType } from '@nestjs/mapped-types';
+import { Card } from '../entities/card.entity';
 
-export class UpdateCardDto extends PartialType(CreateCardDto) {}
+export class UpdateCardDto extends PickType(Card, [
+  'title',
+  'content',
+  'category',
+  'color',
+  'startDate',
+  'endDate'
+]) {}

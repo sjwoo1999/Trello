@@ -1,34 +1,99 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Delete,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { ColumnService } from './column.service';
 import { CreateColumnDto } from './dto/create-column.dto';
+import { BoardService } from 'src/board/board.service';
+import { validate } from 'class-validator';
 import { UpdateColumnDto } from './dto/update-column.dto';
+import { BoardGuard } from 'src/board/guards/board.guard';
+import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 
-@Controller('column')
+@UseGuards(JwtAuthGuard, BoardGuard)
+@Controller('/board/:boardId/column')
 export class ColumnController {
-  constructor(private readonly columnService: ColumnService) {}
+  constructor(
+    private readonly columnService: ColumnService,
+    private readonly boardService: BoardService,
+  ) {}
 
   @Post()
-  create(@Body() createColumnDto: CreateColumnDto) {
-    return this.columnService.create(createColumnDto);
+  async createColumn(
+    @Param('boardId') boardId: number,
+    @Body() createColumn: CreateColumnDto,
+  ) {
+    try {
+      await validate(createColumn);
+
+      await this.boardService.findBoardById(+boardId);
+      createColumn.boardId = +boardId;
+
+      return await this.columnService.createColumn(createColumn);
+    } catch (error) {
+      return { message: `${error}` };
+    }
   }
 
   @Get()
-  findAll() {
-    return this.columnService.findAll();
+  async findAllColumns(@Param('boardId') boardId: number) {
+    try {
+      await this.boardService.findBoardById(+boardId);
+
+      return await this.columnService.findAllColumns(+boardId);
+    } catch (error) {
+      return { message: `${error}` };
+    }
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.columnService.findOne(+id);
+  @Patch('/:columnId')
+  async editColumn(
+    @Param() params: { boardId: number; columnId: number },
+    @Body() updateColumnDto: UpdateColumnDto,
+  ) {
+    try {
+      await this.boardService.findBoardById(params.boardId);
+
+      await this.columnService.editColumn(params.columnId, updateColumnDto);
+
+      return { message: '해당 컬럼을 수정하였습니다.' };
+    } catch (error) {
+      return { message: `${error}` };
+    }
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateColumnDto: UpdateColumnDto) {
-    return this.columnService.update(+id, updateColumnDto);
+  @Delete('/:columnId')
+  async deleteColumn(@Param() params: { boardId: number; columnId: number }) {
+    try {
+      await this.boardService.findBoardById(params.boardId);
+
+      return await this.columnService.deleteColumn(
+        params.boardId,
+        params.columnId,
+      );
+    } catch (error) {
+      return { message: `${error}` };
+    }
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.columnService.remove(+id);
+  @Put('/:columnId')
+  async changeOrderColumn(
+    @Param() params: { boardId: number; columnId: number },
+    @Body('order') order: number,
+  ) {
+    await this.boardService.findBoardById(params.boardId);
+
+    return await this.columnService.changeOrderColumn(
+      params.boardId,
+      params.columnId,
+      order,
+    );
   }
 }
